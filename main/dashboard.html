@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lineage — HR Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f3f4f8; --card:#ffffff; --line:#eceef3;
+    --ink:#1c1e2a; --mut:#8b8fa3; --dim:#b3b6c6;
+    --teal:#1f9e8c; --teal-bg:#e5f5f1; --teal-dk:#146356;
+    --gold:#e8a13a; --gold-bg:#fdf1de;
+    --indigo:#5b6fe0; --indigo-bg:#eaecfc;
+    --rose:#e0616f; --rose-bg:#fbe6e8;
+    --slate:#6b7280; --slate-bg:#eef0f3;
+    --serif:'Fraunces', serif; --sans:'Inter', sans-serif; --mono:'JetBrains Mono', monospace;
+    --radius:16px; --shadow:0 1px 2px rgba(20,20,40,0.04), 0 10px 30px -22px rgba(20,20,40,0.20);
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{ font-family:var(--sans); background:var(--bg); color:var(--ink); font-size:14px; -webkit-font-smoothing:antialiased; }
+  a{ color:inherit; }
+  button, select, input{ font-family:var(--sans); }
+
+  .shell{ display:grid; grid-template-columns:224px 1fr; min-height:100vh; }
+
+  /* ---------- Sidebar ---------- */
+  .side{ background:var(--card); border-right:1px solid var(--line); padding:20px 14px; position:sticky; top:0; height:100vh; display:flex; flex-direction:column; }
+  .brandmini{ display:flex; align-items:center; gap:10px; padding:4px 8px 22px; }
+  .brandmini .m{ width:32px; height:32px; border-radius:9px; background:linear-gradient(155deg, var(--teal), var(--teal-dk)); display:flex; align-items:center; justify-content:center; }
+  .brandmini .m svg{ width:17px; height:17px; }
+  .brandmini b{ font-family:var(--serif); font-size:18px; }
+  .navitem{
+    display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:11px;
+    font-size:13.5px; color:var(--mut); margin-bottom:3px; cursor:pointer; font-weight:500;
+  }
+  .navitem svg{ width:17px; height:17px; flex-shrink:0; }
+  .navitem:hover{ background:var(--bg); color:var(--ink); }
+  .navitem.active{ background:var(--teal); color:#fff; font-weight:600; }
+  .side-bottom{ margin-top:auto; }
+  .profile-mini{ display:flex; align-items:center; gap:10px; padding:12px 10px; border-radius:12px; background:var(--bg); }
+  .profile-mini .av{ width:32px; height:32px; }
+  .profile-mini b{ font-size:12.5px; display:block; }
+  .profile-mini small{ color:var(--mut); font-size:10.5px; }
+
+  /* ---------- Main ---------- */
+  .main{ padding:24px 32px 60px; max-width:1280px; }
+  .view{ display:none; }
+  .view.active{ display:block; }
+
+  /* Topbar shared */
+  .topbar{ display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:22px; flex-wrap:wrap; }
+  .topbar h1{ font-family:var(--serif); font-size:25px; margin:0; }
+  .topbar .desc{ font-size:12.5px; color:var(--mut); margin-top:3px; }
+  .searchwrap{ position:relative; flex:1; max-width:420px; }
+  .searchwrap input{ width:100%; padding:10px 14px 10px 38px; border-radius:11px; border:1px solid var(--line); background:var(--card); font-size:13px; }
+  .searchwrap svg{ position:absolute; left:12px; top:50%; transform:translateY(-50%); width:16px; height:16px; color:var(--dim); }
+  .top-icons{ display:flex; align-items:center; gap:10px; }
+  .icon-btn{ width:38px; height:38px; border-radius:10px; background:var(--card); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--mut); position:relative; }
+  .icon-btn svg{ width:16px; height:16px; }
+  .icon-btn .badge{ position:absolute; top:6px; right:6px; width:7px; height:7px; border-radius:50%; background:var(--rose); }
+  .top-controls{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+
+  select, input[type=text]{ font-size:12.5px; padding:8px 11px; border-radius:9px; border:1px solid var(--line); background:#fff; color:var(--ink); }
+  button{ font-size:12.5px; font-weight:600; padding:8px 15px; border-radius:9px; border:1px solid var(--line); background:#fff; cursor:pointer; }
+  button:hover{ border-color:var(--teal); color:var(--teal-dk); }
+  button.primary{ background:var(--teal); border-color:var(--teal); color:#fff; }
+  button.primary:hover{ background:var(--teal-dk); color:#fff; }
+
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px; box-shadow:var(--shadow); }
+  .card-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .card-head h3{ font-family:var(--serif); font-size:15.5px; margin:0; }
+  .tag{ font-family:var(--mono); font-size:10px; color:var(--mut); background:var(--bg); padding:4px 10px; border-radius:100px; }
+
+  .gapbar{ display:none; gap:10px; background:var(--gold-bg); border:1px solid #f0dbb0; color:#8a6412; border-radius:var(--radius); padding:12px 15px; margin-bottom:18px; font-size:12.5px; }
+  .gapbar.show{ display:flex; }
+  .gapbar ul{ margin:6px 0 0; padding-left:16px; }
+  .gapbar li{ font-family:var(--mono); font-size:11px; margin:2px 0; }
+
+  .avatar{ width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; color:#fff; flex-shrink:0; }
+
+  /* ============ DASHBOARD ============ */
+  .dash-grid{ display:grid; grid-template-columns:2.15fr 1fr; gap:18px; align-items:start; }
+  @media (max-width:1080px){ .dash-grid{ grid-template-columns:1fr; } }
+
+  .kpi-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:16px; }
+  @media (max-width:700px){ .kpi-row{ grid-template-columns:1fr; } }
+  .kpi{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px; box-shadow:var(--shadow); }
+  .kpi-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .kpi-ic{ width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center; }
+  .kpi-ic svg{ width:17px; height:17px; }
+  .kpi select{ font-size:11px; padding:5px 8px; border-radius:7px; }
+  .kpi .lbl{ font-size:12px; color:var(--mut); margin-bottom:6px; }
+  .kpi .val{ font-family:var(--serif); font-size:26px; font-weight:600; display:flex; align-items:baseline; gap:10px; }
+  .kpi .chg{ font-family:var(--mono); font-size:11px; color:var(--teal-dk); background:var(--teal-bg); padding:2px 8px; border-radius:100px; }
+  .kpi .chg.bad{ color:var(--rose); background:var(--rose-bg); }
+
+  .chart-pair{ display:grid; grid-template-columns:1.5fr 1fr; gap:16px; margin-bottom:16px; }
+  @media (max-width:820px){ .chart-pair{ grid-template-columns:1fr; } }
+  .legend-row{ display:flex; gap:16px; align-items:center; }
+  .legend-row .lg{ display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--mut); }
+  .legend-row i{ width:9px; height:9px; border-radius:50%; display:inline-block; }
+  .linechart{ height:190px; margin-top:4px; }
+  .linechart svg{ width:100%; height:100%; overflow:visible; }
+  .axis-labels{ display:flex; justify-content:space-between; font-family:var(--mono); font-size:10px; color:var(--dim); margin-top:6px; padding:0 2px; }
+
+  .donut-wrap{ display:flex; flex-direction:column; align-items:center; }
+  .donut-wrap svg{ width:170px; height:170px; }
+  .donut-center{ text-align:center; margin-top:-118px; margin-bottom:44px; pointer-events:none; }
+  .donut-center b{ font-family:var(--serif); font-size:23px; display:block; }
+  .donut-center span{ font-size:10.5px; color:var(--mut); }
+  .donut-legend{ display:grid; grid-template-columns:1fr 1fr; gap:6px 14px; width:100%; margin-top:6px; }
+  .donut-legend .lg{ display:flex; align-items:center; gap:6px; font-size:11px; color:var(--mut); }
+  .donut-legend i{ width:8px; height:8px; border-radius:50%; }
+
+  table{ width:100%; border-collapse:collapse; font-size:12.5px; }
+  th{ text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--dim); padding:9px 10px; border-bottom:1px solid var(--line); font-weight:600; }
+  td{ padding:11px 10px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  tr:last-child td{ border-bottom:none; }
+  .emp-cell{ display:flex; align-items:center; gap:10px; }
+  .pill{ font-family:var(--sans); font-size:10.5px; font-weight:600; padding:4px 10px; border-radius:100px; display:inline-block; }
+  .pill.teal{ background:var(--teal-bg); color:var(--teal-dk); }
+  .pill.indigo{ background:var(--indigo-bg); color:var(--indigo); }
+  .pill.gold{ background:var(--gold-bg); color:#9a6a12; }
+  .pill.rose{ background:var(--rose-bg); color:var(--rose); }
+  .pill.slate{ background:var(--slate-bg); color:var(--slate); }
+  .dot-status{ width:6px; height:6px; border-radius:50%; display:inline-block; margin-right:6px; }
+
+  .side-list{ list-style:none; margin:0; padding:0; }
+  .side-list li{ display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--line); }
+  .side-list li:last-child{ border-bottom:none; }
+  .side-list .body b{ display:block; font-size:12.5px; }
+  .side-list .body small{ font-size:11px; color:var(--mut); display:flex; align-items:center; gap:4px; }
+  .meet-card{ display:flex; gap:12px; align-items:center; padding:10px 0; border-bottom:1px solid var(--line); }
+  .meet-card:last-child{ border-bottom:none; }
+  .meet-date{ width:42px; height:42px; border-radius:10px; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; flex-shrink:0; }
+  .meet-date .d{ font-family:var(--serif); font-weight:700; font-size:14px; line-height:1; }
+  .meet-date .m{ font-size:8.5px; color:var(--mut); text-transform:uppercase; }
+  .meet-card .body b{ font-size:12.5px; display:block; }
+  .meet-card .body small{ font-size:11px; color:var(--mut); }
+
+  /* ============ shared timeline / graph (Role History tab) ============ */
+  .graph{ background:var(--bg); border:1px solid var(--line); border-radius:var(--radius); padding:6px 16px 16px; overflow-x:auto; margin-bottom:18px; }
+  .graph-row{ display:grid; grid-template-columns:70px 1fr 40px 1fr; align-items:stretch; min-width:600px; }
+  .graph-row .year-col{ display:flex; align-items:center; justify-content:flex-end; font-family:var(--mono); color:var(--dim); font-size:11.5px; padding-right:8px; }
+  .track{ position:relative; padding:12px 4px; }
+  .track::before{ content:''; position:absolute; left:14px; top:0; bottom:0; width:2px; background:var(--line); }
+  .track.role::before{ background:#bfe6de; }
+  .track.person::before{ background:#f0dcae; }
+  .node{ position:relative; margin-left:30px; padding:8px 11px; border-radius:9px; background:#fff; border:1px solid var(--line); font-size:12px; cursor:pointer; }
+  .node:hover{ border-color:var(--dim); }
+  .node .dotmark{ position:absolute; left:-23px; top:12px; width:10px; height:10px; border-radius:50%; border:2px solid var(--bg); }
+  .track.role .dotmark{ background:var(--teal); }
+  .track.person .dotmark{ background:var(--gold); }
+  .node .ttl{ font-weight:700; color:var(--ink); }
+  .node .meta{ color:var(--mut); font-family:var(--mono); font-size:10.5px; margin-top:2px; }
+  .node .evt{ color:var(--dim); font-size:10.5px; margin-top:2px; font-style:italic; }
+  .node.gap{ border-style:dashed; border-color:#e6b25c; }
+  .node.gap .ttl{ color:#a3711a; }
+  .node.empty{ visibility:hidden; }
+  .linkcol{ display:flex; align-items:center; justify-content:center; }
+  .linkcol .bridge{ width:100%; height:2px; background:repeating-linear-gradient(90deg, var(--dim) 0 4px, transparent 4px 8px); position:relative; }
+  .linkcol .bridge::after{ content:'⇄'; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); font-size:10px; color:var(--mut); background:var(--bg); padding:0 2px; }
+  .linkcol.no-link .bridge{ opacity:0.2; }
+  .track-label{ font-family:var(--mono); font-size:9.5px; text-transform:uppercase; letter-spacing:0.07em; color:var(--dim); padding-left:30px; }
+  .panels{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+  @media (max-width:820px){ .panels{ grid-template-columns:1fr; } }
+  .timeline-list{ list-style:none; margin:0; padding:0; }
+  .timeline-list li{ padding:8px 0 8px 18px; border-left:2px solid var(--line); position:relative; margin-left:4px; }
+  .timeline-list li::before{ content:''; position:absolute; left:-6px; top:13px; width:10px; height:10px; border-radius:50%; background:#fff; border:2px solid var(--teal); }
+  .panel-person .timeline-list li::before{ border-color:var(--gold); }
+  .timeline-list li:last-child{ border-left-color:transparent; }
+  .yr{ font-family:var(--mono); color:var(--mut); font-size:11px; }
+  .ti{ font-weight:700; font-size:13px; margin:2px 0; }
+  .sub{ font-size:11.5px; color:var(--mut); }
+  .ev{ font-size:11px; color:var(--dim); font-style:italic; margin-top:2px; }
+  .missing{ color:#a3711a; }
+  .query-row{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:10px; }
+  .query-answer{ padding:11px 13px; border-radius:9px; background:var(--bg); border:1px solid var(--line); font-size:12.5px; }
+  .query-answer b{ color:var(--teal-dk); }
+  .query-answer .warn{ color:#a3711a; }
+
+  /* ============ ORG CHART ============ */
+  .orgchart{ overflow-x:auto; padding:20px 6px; }
+  .otree, .otree ul{ list-style:none; margin:0; padding:0; display:flex; }
+  .otree{ justify-content:center; }
+  .otree ul{ padding-top:26px; position:relative; }
+  .otree li{ position:relative; padding:0 14px; text-align:center; flex:1; }
+  .otree li::before, .otree li::after{ content:''; position:absolute; top:0; }
+  .otree > li{ padding-top:0; }
+  .otree ul li::before{ border-top:2px solid var(--line); width:50%; height:26px; left:0; }
+  .otree ul li::after{ border-top:2px solid var(--line); width:50%; height:26px; right:0; }
+  .otree ul li:only-child::before, .otree ul li:only-child::after{ display:none; }
+  .otree ul li:first-child::before{ border:none; }
+  .otree ul li:last-child::after{ border:none; }
+  .otree ul li:first-child::after, .otree ul li:last-child::before{ border-left:2px solid var(--line); }
+  .otree ul::before{ content:''; position:absolute; top:0; left:50%; border-left:2px solid var(--line); width:0; height:26px; }
+  .onode{ display:inline-block; background:#fff; border:1px solid var(--line); border-radius:11px; padding:10px 13px; min-width:132px; cursor:pointer; text-align:left; box-shadow:var(--shadow); }
+  .onode:hover{ border-color:var(--teal); }
+  .onode .nm{ font-family:var(--serif); font-weight:600; font-size:13px; }
+  .onode .rl{ font-size:10.5px; color:var(--mut); margin-top:2px; }
+  .onode .hc{ font-family:var(--mono); font-size:9.5px; color:var(--dim); margin-top:4px; }
+  .onode.dept-technology{ border-top:3px solid var(--teal); }
+  .onode.dept-product{ border-top:3px solid var(--gold); }
+  .onode.dept-leadership{ border-top:3px solid var(--rose); }
+
+  /* ============ PEOPLE ============ */
+  .people-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:20px; }
+  @media (max-width:820px){ .people-grid{ grid-template-columns:1fr 1fr; } }
+  .pcard{ background:#fff; border:1px solid var(--line); border-radius:13px; padding:14px; cursor:pointer; box-shadow:var(--shadow); }
+  .pcard:hover{ border-color:var(--teal); }
+  .pcard .top{ display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .pcard .nm{ font-family:var(--serif); font-weight:600; font-size:14.5px; }
+  .pcard .rl{ font-size:11.5px; color:var(--mut); }
+  .pcard .meta{ font-size:11px; color:var(--dim); font-family:var(--mono); }
+  .profile{ display:none; }
+  .profile.show{ display:block; }
+  .profile-head{ display:flex; align-items:center; gap:14px; margin-bottom:16px; }
+  .profile-head .avatar{ width:52px; height:52px; font-size:16px; }
+  .profile-head h2{ font-family:var(--serif); font-size:21px; margin:0; }
+  .profile-head .sub{ font-size:12.5px; color:var(--mut); margin-top:2px; }
+  .profile-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:820px){ .profile-grid{ grid-template-columns:1fr; } }
+  .rev-card{ border-bottom:1px solid var(--line); padding:12px 0; display:flex; gap:14px; align-items:flex-start; }
+  .rev-card:last-child{ border-bottom:none; }
+  .rev-score{ font-family:var(--serif); font-size:19px; font-weight:700; color:var(--teal-dk); background:var(--teal-bg); border-radius:9px; width:42px; height:42px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .rev-body b{ font-size:13px; }
+  .rev-body .meta{ font-size:11px; color:var(--dim); font-family:var(--mono); margin:2px 0 4px; }
+  .rev-body p{ font-size:12.5px; color:var(--mut); margin:0; }
+  .bar-mini{ width:70px; height:6px; border-radius:4px; background:var(--line); overflow:hidden; display:inline-block; vertical-align:middle; margin-right:6px; }
+  .bar-mini span{ display:block; height:100%; background:var(--teal); }
+
+  /* ============ ANALYTICS bars ============ */
+  .bars{ display:flex; align-items:flex-end; gap:10px; height:130px; margin-top:6px; }
+  .bar-grp{ flex:1; display:flex; gap:3px; align-items:flex-end; height:100%; position:relative; }
+  .bar{ flex:1; border-radius:5px 5px 2px 2px; position:relative; }
+  .bar.tech{ background:linear-gradient(180deg,var(--teal),var(--teal-dk)); }
+  .bar.prod{ background:linear-gradient(180deg,var(--gold),#a9740f); }
+  .bar-grp span{ position:absolute; bottom:-18px; left:0; right:0; text-align:center; font-family:var(--mono); font-size:9px; color:var(--dim); }
+  .legend{ display:flex; gap:14px; margin-top:20px; font-size:11px; color:var(--mut); }
+  .legend i{ width:10px; height:10px; border-radius:3px; display:inline-block; margin-right:5px; vertical-align:middle; }
+  .mini-line{ height:130px; }
+  .mini-line svg{ width:100%; height:100%; }
+  .chart-row{ display:grid; grid-template-columns:1.3fr 1fr; gap:16px; margin-bottom:16px; }
+  @media (max-width:820px){ .chart-row{ grid-template-columns:1fr; } }
+
+  footer.note{ text-align:center; color:var(--dim); font-size:11px; font-family:var(--mono); margin-top:30px; }
+
+  @media (max-width:900px){ .side{ display:none; } .shell{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="side">
+    <div class="brandmini">
+      <div class="m"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2 L12 22 M12 2 L6 8 M12 2 L18 8 M12 22 L7 16 M12 22 L17 16" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <b>Lineage</b>
+    </div>
+    <div class="navitem active" data-view="dashboard" onclick="switchView('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="5" rx="2"/><rect x="13" y="11" width="8" height="10" rx="2"/><rect x="3" y="14" width="8" height="7" rx="2"/></svg>
+      Dashboard
+    </div>
+    <div class="navitem" data-view="overview" onclick="switchView('overview')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+      Role History
+    </div>
+    <div class="navitem" data-view="orgchart" onclick="switchView('orgchart')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.3"/><circle cx="5" cy="19" r="2.3"/><circle cx="19" cy="19" r="2.3"/><path d="M12 7.3V13M12 13L5 16.8M12 13l7 3.8"/></svg>
+      Org Chart
+    </div>
+    <div class="navitem" data-view="people" onclick="switchView('people')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.8 20c0-3.4 2.8-6 6.2-6s6.2 2.6 6.2 6"/><circle cx="17" cy="8" r="2.6"/><path d="M15.5 14.3c2.9.4 5 2.8 5 5.7"/></svg>
+      People
+    </div>
+    <div class="navitem" data-view="leave" onclick="switchView('leave')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 3v3M16 3v3"/></svg>
+      Leave &amp; Attendance
+    </div>
+    <div class="navitem" data-view="performance" onclick="switchView('performance')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.5 5.2 5.7.8-4.1 4 1 5.7L12 16.5l-5.1 2.7 1-5.7-4.1-4 5.7-.8z"/></svg>
+      Performance
+    </div>
+    <div class="navitem" data-view="analytics" onclick="switchView('analytics')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M11 20V4M18 20v-7"/></svg>
+      Analytics
+    </div>
+    <div class="side-bottom">
+      <div class="profile-mini">
+        <div class="avatar av" style="background:linear-gradient(155deg,var(--teal),var(--teal-dk));">AM</div>
+        <div><b>Amir</b><small>Admin</small></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- ============ DASHBOARD (new, modern) ============ -->
+    <div class="view active" id="view-dashboard">
+      <div class="topbar">
+        <div><h1>Dashboard</h1></div>
+        <div class="searchwrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input type="text" placeholder="Search people, roles…">
+        </div>
+        <div class="top-icons">
+          <div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 4.8 1c0 1.6-2.3 1.8-2.3 3.4M12 17h.01"/></svg></div>
+          <div class="icon-btn"><span class="badge"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3a5 5 0 0 0-5 5v3.5L5 15h14l-2-3.5V8a5 5 0 0 0-5-5z"/><path d="M9.5 18a2.5 2.5 0 0 0 5 0"/></svg></div>
+          <div class="avatar" style="background:linear-gradient(155deg,var(--indigo),#3b46a8);">AM</div>
+        </div>
+      </div>
+
+      <div class="gapbar" id="gapBanner">
+        <div><b>Data gaps detected</b> — shown, not hidden.
+        <ul id="gapList"></ul></div>
+      </div>
+
+      <div class="dash-grid">
+        <div>
+          <div class="kpi-row" id="dashKpis"></div>
+
+          <div class="chart-pair">
+            <div class="card">
+              <div class="card-head">
+                <div><h3>Attendance</h3></div>
+                <div style="display:flex; align-items:center; gap:14px;">
+                  <div class="legend-row">
+                    <span class="lg"><i style="background:var(--teal)"></i>On time</span>
+                    <span class="lg"><i style="background:var(--gold)"></i>Late</span>
+                    <span class="lg"><i style="background:var(--rose)"></i>Absent</span>
+                  </div>
+                  <select><option>Last 6 months</option></select>
+                </div>
+              </div>
+              <div class="linechart"><svg id="attendanceSvg" viewBox="0 0 480 170" preserveAspectRatio="none"></svg></div>
+              <div class="axis-labels" id="attendanceAxis"></div>
+            </div>
+
+            <div class="card">
+              <div class="card-head"><h3>Employee Roles</h3></div>
+              <div class="donut-wrap">
+                <svg id="rolesDonut" viewBox="0 0 100 100"></svg>
+                <div class="donut-center"><b id="donutTotal">0</b><span>Employees</span></div>
+                <div class="donut-legend" id="donutLegend"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h3>Employee Status</h3><span class="tag" onclick="switchView('people')" style="cursor:pointer;">View all</span></div>
+            <table>
+              <thead><tr><th>Employee</th><th>Joined</th><th>Job title</th><th>Team</th><th>Salary</th><th>Performance</th><th>Status</th></tr></thead>
+              <tbody id="statusTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div>
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-head"><h3>Employee on Leave</h3></div>
+            <ul class="side-list" id="onLeaveList"></ul>
+          </div>
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-head"><h3>Today's Reviews</h3></div>
+            <ul class="side-list" id="todayReviews"></ul>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Meetings</h3></div>
+            <div id="meetingsList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ ROLE HISTORY (formerly Overview) ============ -->
+    <div class="view" id="view-overview">
+      <div class="topbar">
+        <div><h1>Role History</h1><div class="desc">Role history and people journeys, connected.</div></div>
+        <div class="top-controls">
+          <select id="deptFilter" onchange="renderOverview()"></select>
+          <select id="yearFilter" onchange="renderOverview()"></select>
+          <input type="text" id="searchBox" placeholder="search role or person…" oninput="renderOverview()">
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:18px;">
+        <div class="card-head"><h3>Ask the connection</h3></div>
+        <div class="query-row">
+          <span style="font-size:12px;color:var(--dim)">Who held</span>
+          <select id="qRole"></select>
+          <span style="font-size:12px;color:var(--dim)">in</span>
+          <select id="qYear"></select>
+          <button class="primary" onclick="answerQuery()">Show</button>
+        </div>
+        <div class="query-answer" id="queryAnswer">Pick a role and a year to trace the person behind it.</div>
+      </div>
+
+      <div class="card-head" style="margin-bottom:8px;"><h3>Role ↔ person timeline</h3><span class="tag">connector shows the occupant that year</span></div>
+      <div class="graph" id="graphContainer"></div>
+
+      <div class="panels">
+        <div class="card">
+          <div class="card-head"><h3 id="roleTitleHead">—</h3><span class="tag">role</span></div>
+          <ul class="timeline-list" id="roleTimeline"></ul>
+        </div>
+        <div class="card panel-person">
+          <div class="card-head"><h3 id="personTitleHead">—</h3><span class="tag">person</span></div>
+          <ul class="timeline-list" id="personTimeline"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ ORG CHART ============ -->
+    <div class="view" id="view-orgchart">
+      <div class="topbar"><div><h1>Org Chart</h1><div class="desc">Current reporting lines, built from live role assignments.</div></div></div>
+      <div class="card"><div class="orgchart" id="orgChartContainer"></div></div>
+    </div>
+
+    <!-- ============ PEOPLE ============ -->
+    <div class="view" id="view-people">
+      <div class="topbar">
+        <div><h1>People</h1><div class="desc">Every employee, one profile each.</div></div>
+        <div class="top-controls"><input type="text" id="peopleSearch" placeholder="search people…" oninput="renderPeople()"></div>
+      </div>
+      <div class="people-grid" id="peopleGrid"></div>
+      <div class="profile card" id="profileCard">
+        <div class="profile-head">
+          <div class="avatar" id="profAvatar">—</div>
+          <div><h2 id="profName">—</h2><div class="sub" id="profSub">—</div></div>
+        </div>
+        <div class="profile-grid">
+          <div class="card"><div class="card-head"><h3>Role history</h3></div><ul class="timeline-list" id="profHistory"></ul></div>
+          <div class="card"><div class="card-head"><h3>Leave &amp; performance snapshot</h3></div><div id="profSnapshot"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ LEAVE ============ -->
+    <div class="view" id="view-leave">
+      <div class="topbar"><div><h1>Leave &amp; Attendance</h1><div class="desc">Balances, utilisation, and recent requests.</div></div></div>
+      <div class="kpi-row" id="leaveKpis"></div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-head"><h3>By employee</h3></div>
+        <table><thead><tr><th>Employee</th><th>Dept</th><th>Balance</th><th>Taken</th><th>Attendance</th></tr></thead><tbody id="leaveTable"></tbody></table>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Recent requests</h3></div>
+        <table><thead><tr><th>Employee</th><th>Type</th><th>Dates</th><th>Status</th></tr></thead><tbody id="leaveRequests"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ============ PERFORMANCE ============ -->
+    <div class="view" id="view-performance">
+      <div class="topbar">
+        <div><h1>Performance</h1><div class="desc">Review history across cycles.</div></div>
+        <div class="top-controls"><select id="cycleFilter" onchange="renderPerformance()"></select></div>
+      </div>
+      <div class="card"><div id="reviewsList"></div></div>
+    </div>
+
+    <!-- ============ ANALYTICS ============ -->
+    <div class="view" id="view-analytics">
+      <div class="topbar"><div><h1>Headcount &amp; Attrition</h1><div class="desc">Where the org grew, and where it lost people.</div></div></div>
+      <div class="kpi-row" id="analyticsKpis"></div>
+      <div class="chart-row">
+        <div class="card">
+          <div class="card-head"><h3>Headcount by department</h3><span class="tag">2021–2025</span></div>
+          <div class="bars" id="headcountBars"></div>
+          <div class="legend"><span><i style="background:var(--teal)"></i>Technology</span><span><i style="background:var(--gold)"></i>Product</span></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Attrition rate</h3><span class="tag">annual %</span></div>
+          <div class="mini-line"><svg id="attritionSvg" viewBox="0 0 220 100" preserveAspectRatio="none"></svg></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Hires vs. exits</h3><span class="tag">per year</span></div>
+        <div class="bars" id="hireExitBars"></div>
+      </div>
+    </div>
+
+    <footer class="note">Lineage HR console · mock data, client-side only</footer>
+  </div>
+</div>
+
+<script>
+/* ============================= DATA MODEL ============================= */
+let roles = [
+  { id:'role-se', title:'Software Engineer', department:'Technology', history:[
+    { year:2022, title:'Junior Software Engineer', reportingTo:'Nadia Rahman (Eng. Manager)', headcount:3, occupant:'amir', event:'Role created' },
+    { year:2023, title:'Junior Software Engineer', reportingTo:'Nadia Rahman (Eng. Manager)', headcount:4, occupant:'amir', event:'Headcount increased' },
+    { year:2024, title:'Software Engineer', reportingTo:'Farid Iskandar (Tech Lead)', headcount:5, occupant:'amir', event:'Redesignated; reporting line moved to Tech Lead' },
+    { year:2025, title:'Senior Software Engineer', reportingTo:'Farid Iskandar (Tech Lead)', headcount:null, occupant:'amir', event:'Title promoted — headcount not yet reported' },
+  ]},
+  { id:'role-pm', title:'Product Manager', department:'Product', history:[
+    { year:2022, title:'Associate Product Manager', reportingTo:'Suresh Kumar (Head of Product)', headcount:2, occupant:'ain', event:'Role created' },
+    { year:2023, title:'Product Manager', reportingTo:'Suresh Kumar (Head of Product)', headcount:2, occupant:'ain', event:'Promotion' },
+    { year:2024, title:'Product Manager', reportingTo:null, headcount:3, occupant:'ain', event:'Reporting line vacant — Head of Product role open' },
+    { year:2025, title:'Senior Product Manager', reportingTo:'Wei Ling (VP Product)', headcount:3, occupant:'ain', event:'Reporting line moved to VP Product' },
+  ]},
+  { id:'role-ds', title:'Data Analyst', department:'Technology', history:[
+    { year:2023, title:'Data Analyst', reportingTo:'Farid Iskandar (Tech Lead)', headcount:2, occupant:'haziq', event:'Role created' },
+    { year:2024, title:'Data Analyst', reportingTo:'Farid Iskandar (Tech Lead)', headcount:2, occupant:null, event:'No occupant on file for this year' },
+    { year:2025, title:'Senior Data Analyst', reportingTo:'Farid Iskandar (Tech Lead)', headcount:2, occupant:'haziq', event:'Promotion; role re-filled' },
+  ]},
+];
+
+let employees = [
+  { id:'zul', name:'Zul Hassan', title:'CEO', department:'Leadership', managerId:null, joinYear:2019, joinDate:'11 Feb 2019', salary:'$9,200', status:'Active',
+    leaveBalance:18, leaveTaken:4, attendanceRate:98, leaveRequests:[], performanceReviews:[],
+    history:[{year:2019, title:'CEO', department:'Leadership', manager:null, event:'Founded / took over leadership'}] },
+
+  { id:'farid', name:'Farid Iskandar', title:'Tech Lead', department:'Technology', managerId:'zul', joinYear:2020, joinDate:'03 Jun 2020', salary:'$5,400', status:'Active',
+    leaveBalance:10, leaveTaken:8, attendanceRate:95, leaveRequests:[
+      {type:'Annual leave', dates:'12–14 Aug 2026', status:'approved'},
+    ], performanceReviews:[
+      {cycle:'H1 2026', score:4.5, reviewer:'Zul Hassan', summary:'Strong technical leadership through the platform migration.'},
+    ],
+    history:[
+      {year:2020, title:'Senior Software Engineer', department:'Engineering', manager:'Zul Hassan', event:'Joined'},
+      {year:2023, title:'Tech Lead', department:'Technology', manager:'Zul Hassan', event:'Promoted; took reporting line for Engineering redesign'},
+    ]},
+
+  { id:'weiling', name:'Wei Ling', title:'VP Product', department:'Product', managerId:'zul', joinYear:2021, joinDate:'20 Sep 2021', salary:'$6,800', status:'Active',
+    leaveBalance:14, leaveTaken:3, attendanceRate:97, leaveRequests:[], performanceReviews:[
+      {cycle:'H1 2026', score:4.7, reviewer:'Zul Hassan', summary:'Rebuilt the product org after the Head of Product departure.'},
+    ],
+    history:[
+      {year:2021, title:'Senior Product Manager', department:'Product', manager:'Suresh Kumar', event:'Joined'},
+      {year:2025, title:'VP Product', department:'Product', manager:'Zul Hassan', event:'Promoted after Suresh Kumar departed'},
+    ]},
+
+  { id:'nadia', name:'Nadia Rahman', title:'Engineering Manager', department:'Technology', managerId:'zul', joinYear:2019, joinDate:'02 Apr 2019', salary:'$5,100', status:'On Leave',
+    leaveBalance:6, leaveTaken:12, attendanceRate:89, leaveRequests:[
+      {type:'Medical leave', dates:'2–3 Jul 2026', status:'approved'},
+    ], performanceReviews:[
+      {cycle:'H2 2025', score:3.2, reviewer:'Zul Hassan', summary:'Team restructured; direct reports moved under the new Tech Lead line.'},
+    ],
+    history:[
+      {year:2019, title:'Engineering Manager', department:'Engineering', manager:'Zul Hassan', event:'Joined'},
+      {year:2024, title:'Engineering Manager', department:'Engineering', manager:'Zul Hassan', event:'Team moved under Tech Lead reporting line — 0 direct reports currently'},
+    ]},
+
+  { id:'amir', name:'Amir', title:'Senior Software Engineer', department:'Technology', managerId:'farid', joinYear:2022, joinDate:'14 Mar 2022', salary:'$3,600', status:'Active',
+    leaveBalance:9, leaveTaken:6, attendanceRate:96, leaveRequests:[
+      {type:'Annual leave', dates:'20–22 Aug 2026', status:'pending'},
+      {type:'Annual leave', dates:'3–5 Mar 2026', status:'approved'},
+    ], performanceReviews:[
+      {cycle:'H1 2026', score:4.3, reviewer:'Farid Iskandar', summary:'Promoted to Senior; led the redesignation of the SE role cleanly.'},
+      {cycle:'H2 2025', score:4.0, reviewer:'Farid Iskandar', summary:'Consistent delivery, ready for more scope.'},
+    ],
+    history:[
+      { year:2022, title:'Junior Software Engineer', department:'Engineering', manager:'Nadia Rahman', event:'Joined as Junior Software Engineer' },
+      { year:2023, title:'Junior Software Engineer', department:'Engineering', manager:'Nadia Rahman', event:'Confirmed after probation' },
+      { year:2024, title:'Software Engineer', department:'Technology', manager:'Farid Iskandar', event:'Transferred from Engineering to Technology + promoted' },
+      { year:2025, title:'Senior Software Engineer', department:'Technology', manager:null, event:'Promoted to Senior — manager record missing for 2025' },
+    ]},
+
+  { id:'haziq', name:'Haziq', title:'Senior Data Analyst', department:'Technology', managerId:'farid', joinYear:2023, joinDate:'07 Jan 2023', salary:'$3,300', status:'Active',
+    leaveBalance:15, leaveTaken:2, attendanceRate:99, leaveRequests:[
+      {type:'Annual leave', dates:'1–2 Sep 2026', status:'pending'},
+    ], performanceReviews:[
+      {cycle:'H1 2026', score:4.6, reviewer:'Farid Iskandar', summary:'Promoted to Senior; strongest data quality record on the team.'},
+    ],
+    history:[
+      { year:2023, title:'Data Analyst', department:'Technology', manager:'Farid Iskandar', event:'Joined as Data Analyst' },
+      { year:2025, title:'Senior Data Analyst', department:'Technology', manager:'Farid Iskandar', event:'Promoted to Senior — 2024 record missing entirely' },
+    ]},
+
+  { id:'ain', name:'Ain', title:'Senior Product Manager', department:'Product', managerId:'weiling', joinYear:2022, joinDate:'29 Oct 2022', salary:'$4,200', status:'On Leave',
+    leaveBalance:11, leaveTaken:5, attendanceRate:94, leaveRequests:[
+      {type:'Annual leave', dates:'15–19 Sep 2026', status:'rejected'},
+    ], performanceReviews:[
+      {cycle:'H1 2026', score:4.4, reviewer:'Wei Ling', summary:'Promoted to Senior; owns the roadmap end to end now.'},
+      {cycle:'H2 2025', score:3.8, reviewer:'Suresh Kumar', summary:'Solid quarter despite manager transition.'},
+    ],
+    history:[
+      { year:2022, title:'Associate Product Manager', department:'Product', manager:'Suresh Kumar', event:'Joined as Associate PM' },
+      { year:2023, title:'Product Manager', department:'Product', manager:'Suresh Kumar', event:'Promoted to Product Manager' },
+      { year:2024, title:'Product Manager', department:'Product', manager:null, event:'Manager departed; backfill pending' },
+      { year:2025, title:'Senior Product Manager', department:'Product', manager:'Wei Ling', event:'Promoted; now reports to VP Product' },
+    ]},
+];
+
+let dataGaps = [];
+let selected = { roleId:null, employeeId:null };
+let selectedProfileId = null;
+
+const avatarColors = ['#1f9e8c','#5b6fe0','#e8a13a','#e0616f','#146356','#8a5cf5'];
+function colorFor(id){ let h=0; for(const c of id) h=(h*31+c.charCodeAt(0))%avatarColors.length; return avatarColors[h]; }
+function initials(name){ return name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
+function avatarHtml(emp, size){
+  return `<div class="avatar" style="background:${colorFor(emp.id)};${size?`width:${size}px;height:${size}px;font-size:${size*0.34}px;`:''}">${initials(emp.name)}</div>`;
+}
+
+/* ============================= NAV ============================= */
+function switchView(name){
+  document.querySelectorAll('.navitem').forEach(n=>n.classList.toggle('active', n.dataset.view===name));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id==='view-'+name));
+  if(name==='dashboard') renderDashboard();
+  if(name==='overview') renderOverview();
+  if(name==='orgchart') renderOrgChart();
+  if(name==='people') renderPeople();
+  if(name==='leave') renderLeave();
+  if(name==='performance') renderPerformance();
+  if(name==='analytics') renderAnalytics();
+}
+
+/* ============================= GAP DETECTION ============================= */
+function detectGaps(){
+  dataGaps = [];
+  const empIds = new Set(employees.map(e=>e.id));
+  roles.forEach(r=>{
+    r.history.forEach(h=>{
+      if(!h.reportingTo) dataGaps.push(`Role "${r.title}" (${h.year}): reporting line not recorded`);
+      if(h.headcount===null || h.headcount===undefined) dataGaps.push(`Role "${r.title}" (${h.year}): headcount not reported`);
+      if(!h.occupant) dataGaps.push(`Role "${r.title}" (${h.year}): no occupant on file`);
+      else if(!empIds.has(h.occupant)) dataGaps.push(`Role "${r.title}" (${h.year}): occupant id "${h.occupant}" unresolved`);
+    });
+  });
+  employees.forEach(e=>{ e.history.forEach(h=>{ if(!h.manager) dataGaps.push(`Employee "${e.name}" (${h.year}): manager not recorded`); }); });
+  const banner = document.getElementById('gapBanner');
+  const list = document.getElementById('gapList');
+  list.innerHTML='';
+  if(dataGaps.length===0){ banner.classList.remove('show'); return; }
+  banner.classList.add('show');
+  dataGaps.slice(0,6).forEach(g=>{ const li=document.createElement('li'); li.textContent=g; list.appendChild(li); });
+  if(dataGaps.length>6){ const li=document.createElement('li'); li.textContent=`…and ${dataGaps.length-6} more`; list.appendChild(li); }
+}
+
+/* ============================= DASHBOARD ============================= */
+function renderDashboard(){
+  const activeCount = employees.filter(e=>e.status==='Active').length;
+  const pendingLeave = employees.reduce((s,e)=>s+e.leaveRequests.filter(r=>r.status==='pending').length,0);
+  const avgScoreAll = (employees.flatMap(e=>e.performanceReviews).reduce((s,r,_,arr)=>s+r.score/arr.length,0)).toFixed(1);
+
+  document.getElementById('dashKpis').innerHTML = `
+    <div class="kpi">
+      <div class="kpi-top"><div class="kpi-ic" style="background:var(--teal-bg); color:var(--teal-dk);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M2.8 20c0-3.4 2.8-6 6.2-6s6.2 2.6 6.2 6"/><circle cx="17" cy="8" r="2.6"/><path d="M15.5 14.3c2.9.4 5 2.8 5 5.7"/></svg></div><select><option>Monthly</option><option>Yearly</option></select></div>
+      <div class="lbl">Active employees</div>
+      <div class="val">${activeCount} <span class="chg">▲ 8%</span></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-top"><div class="kpi-ic" style="background:var(--gold-bg); color:#9a6a12;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 3v3M16 3v3"/></svg></div><select><option>Yearly</option><option>Monthly</option></select></div>
+      <div class="lbl">Pending leave requests</div>
+      <div class="val">${pendingLeave} <span class="chg bad">▲ 20%</span></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-top"><div class="kpi-ic" style="background:var(--indigo-bg); color:var(--indigo);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3.5l2.5 5.2 5.7.8-4.1 4 1 5.7L12 16.5l-5.1 2.7 1-5.7-4.1-4 5.7-.8z"/></svg></div><select><option>Yearly</option></select></div>
+      <div class="lbl">Avg. performance score</div>
+      <div class="val">${avgScoreAll} <span class="chg">▲ 5%</span></div>
+    </div>
+  `;
+
+  renderAttendanceChart();
+  renderRolesDonut();
+  renderStatusTable();
+  renderSidePanels();
+}
+
+function renderAttendanceChart(){
+  const months = ['Jan','Feb','Mar','Apr','May','Jun'];
+  const onTime = [72,78,74,82,80,88];
+  const late   = [18,14,20,10,14,8];
+  const absent = [10,8,6,8,6,4];
+  const w=480,h=170;
+  const toPts = arr => arr.map((v,i)=> `${(i/(arr.length-1))*w},${h-(v/100)*h}`).join(' ');
+  const svg = document.getElementById('attendanceSvg');
+  svg.innerHTML = `
+    <polyline points="${toPts(onTime)}" fill="none" stroke="var(--teal)" stroke-width="2.5" style="stroke:#1f9e8c"/>
+    <polyline points="${toPts(late)}" fill="none" stroke-width="2.5" style="stroke:#e8a13a"/>
+    <polyline points="${toPts(absent)}" fill="none" stroke-width="2.5" style="stroke:#e0616f"/>
+  `;
+  document.getElementById('attendanceAxis').innerHTML = months.map(m=>`<span>${m}</span>`).join('');
+}
+
+function renderRolesDonut(){
+  const byTitle = {};
+  employees.forEach(e=>{ byTitle[e.title] = (byTitle[e.title]||0)+1; });
+  const entries = Object.entries(byTitle);
+  const total = employees.length;
+  const colors = ['#1f9e8c','#e8a13a','#5b6fe0','#e0616f','#146356','#8a5cf5','#6b7280'];
+  let acc = 0;
+  const r=40, cx=50, cy=50;
+  let paths = '';
+  entries.forEach(([title,count],i)=>{
+    const frac = count/total;
+    const start = acc*2*Math.PI - Math.PI/2;
+    acc += frac;
+    const end = acc*2*Math.PI - Math.PI/2;
+    const x1=cx+r*Math.cos(start), y1=cy+r*Math.sin(start);
+    const x2=cx+r*Math.cos(end), y2=cy+r*Math.sin(end);
+    const large = frac>0.5 ? 1 : 0;
+    paths += `<path d="M${cx},${cy} L${x1.toFixed(2)},${y1.toFixed(2)} A${r},${r} 0 ${large} 1 ${x2.toFixed(2)},${y2.toFixed(2)} Z" fill="${colors[i%colors.length]}"/>`;
+  });
+  document.getElementById('rolesDonut').innerHTML = paths + `<circle cx="${cx}" cy="${cy}" r="24" fill="#fff"/>`;
+  document.getElementById('donutTotal').textContent = total;
+  document.getElementById('donutLegend').innerHTML = entries.map(([title,count],i)=>
+    `<div class="lg"><i style="background:${colors[i%colors.length]}"></i>${title} (${count})</div>`).join('');
+}
+
+function statusPillClass(status){
+  return status==='Active' ? 'teal' : status==='On Leave' ? 'rose' : 'gold';
+}
+function renderStatusTable(){
+  const tbody = document.getElementById('statusTable'); tbody.innerHTML='';
+  employees.forEach(e=>{
+    const avgScore = e.performanceReviews.length ? (e.performanceReviews.reduce((s,r)=>s+r.score,0)/e.performanceReviews.length) : null;
+    const perfWord = avgScore==null ? '—' : avgScore>=4.4 ? 'Excellent' : avgScore>=3.8 ? 'Very Good' : avgScore>=3 ? 'Good' : 'Needs Support';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><div class="emp-cell">${avatarHtml(e,30)}<div><b>${e.name}</b></div></div></td>
+      <td>${e.joinDate}</td>
+      <td>${e.title}</td>
+      <td><span class="pill ${e.department==='Technology'?'teal':e.department==='Product'?'gold':'indigo'}">${e.department}</span></td>
+      <td>${e.salary}</td>
+      <td>${perfWord}</td>
+      <td><span class="pill ${statusPillClass(e.status)}"><span class="dot-status" style="background:currentColor"></span>${e.status}</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderSidePanels(){
+  const onLeave = employees.filter(e=> e.leaveRequests.some(r=>r.status==='approved') );
+  document.getElementById('onLeaveList').innerHTML = onLeave.length ? onLeave.map(e=>{
+    const req = e.leaveRequests.find(r=>r.status==='approved');
+    return `<li>${avatarHtml(e,34)}<div class="body"><b>${e.name}</b><small>${req.dates} · ${req.type}</small></div></li>`;
+  }).join('') : '<li style="color:var(--mut); font-size:12px;">No one on approved leave right now.</li>';
+
+  const reviewsToday = employees.filter(e=>e.performanceReviews.length).slice(0,3);
+  document.getElementById('todayReviews').innerHTML = reviewsToday.map((e,i)=>{
+    const r = e.performanceReviews[0];
+    return `<li>${avatarHtml(e,34)}<div class="body"><b>${e.name}</b><small>${['10:30 AM','1:00 PM','3:30 PM'][i%3]} · ${r.cycle} review</small></div></li>`;
+  }).join('');
+
+  const meetings = [
+    {d:'03', m:'Mon', title:'Headcount review', time:'09:00 – 10:00 AM'},
+    {d:'05', m:'Wed', title:'Performance calibration', time:'02:00 – 03:00 PM'},
+    {d:'09', m:'Mon', title:'Org restructure sync', time:'11:00 AM – 12:00 PM'},
+  ];
+  document.getElementById('meetingsList').innerHTML = meetings.map(m=>
+    `<div class="meet-card"><div class="meet-date"><div class="d">${m.d}</div><div class="m">${m.m}</div></div><div class="body"><b>${m.title}</b><small>${m.time}</small></div></div>`
+  ).join('');
+}
+
+/* ============================= ROLE HISTORY (overview) ============================= */
+function empName(id){ if(!id) return null; const e=employees.find(x=>x.id===id); return e? e.name : `⚠ unresolved (${id})`; }
+
+function populateOverviewFilters(){
+  const dept=document.getElementById('deptFilter'); const yr=document.getElementById('yearFilter');
+  const depts=new Set(['All']); roles.forEach(r=>depts.add(r.department)); employees.forEach(e=>depts.add(e.department));
+  dept.innerHTML=''; [...depts].forEach(d=>{ const o=document.createElement('option'); o.value=d; o.textContent=d; dept.appendChild(o); });
+  const years=new Set(); roles.forEach(r=>r.history.forEach(h=>years.add(h.year)));
+  const ys=[...years].sort((a,b)=>a-b);
+  yr.innerHTML=''; const allOpt=document.createElement('option'); allOpt.value='All'; allOpt.textContent='All'; yr.appendChild(allOpt);
+  ys.forEach(y=>{ const o=document.createElement('option'); o.value=y; o.textContent=y; yr.appendChild(o); });
+  const qRole=document.getElementById('qRole'); qRole.innerHTML='';
+  roles.forEach(r=>{ const o=document.createElement('option'); o.value=r.id; o.textContent=r.title; qRole.appendChild(o); });
+  const qYear=document.getElementById('qYear'); qYear.innerHTML='';
+  ys.forEach(y=>{ const o=document.createElement('option'); o.value=y; o.textContent=y; qYear.appendChild(o); });
+}
+function renderOverview(){
+  const dept=document.getElementById('deptFilter').value||'All';
+  const q=(document.getElementById('searchBox').value||'').toLowerCase().trim();
+  let visRoles=roles.filter(r=>(dept==='All'||r.department===dept)&&(!q||r.title.toLowerCase().includes(q)));
+  let visEmps=employees.filter(e=>(dept==='All'||e.department===dept)&&(!q||e.name.toLowerCase().includes(q)));
+  const focusRole = visRoles[0] || roles[0];
+  const focusEmpFromSearch = visEmps.find(e=>focusRole && focusRole.history.some(h=>h.occupant===e.id));
+  const focusEmp = focusEmpFromSearch || (focusRole && employees.find(e=>focusRole.history.some(h=>h.occupant===e.id))) || employees[0];
+  selected.roleId = focusRole? focusRole.id : null;
+  selected.employeeId = focusEmp? focusEmp.id : null;
+  renderGraph(document.getElementById('yearFilter').value||'All');
+  renderRolePanel(); renderPersonPanel();
+}
+function renderGraph(yearSel){
+  const container=document.getElementById('graphContainer'); container.innerHTML='';
+  const role=roles.find(r=>r.id===selected.roleId); const emp=employees.find(e=>e.id===selected.employeeId);
+  if(!role && !emp){ container.innerHTML='<div style="padding:16px;color:var(--dim);font-family:var(--mono);font-size:12px;">No match.</div>'; return; }
+  const label=document.createElement('div'); label.className='graph-row';
+  label.innerHTML=`<div></div><div class="track-label">Role · ${role?role.title:'—'}</div><div></div><div class="track-label">Person · ${emp?emp.name:'—'}</div>`;
+  container.appendChild(label);
+  let years=new Set(); (role?role.history:[]).forEach(h=>years.add(h.year)); (emp?emp.history:[]).forEach(h=>years.add(h.year));
+  years=[...years].sort((a,b)=>a-b);
+  if(yearSel!=='All') years=years.filter(y=>String(y)===String(yearSel));
+  if(years.length===0){ container.innerHTML+='<div style="padding:12px;color:var(--dim);font-family:var(--mono);font-size:11.5px;">No records for this year.</div>'; return; }
+  years.forEach(y=>{
+    const rEntry=role?role.history.find(h=>h.year===y):null;
+    const eEntry=emp?emp.history.find(h=>h.year===y):null;
+    const linked=rEntry && eEntry && rEntry.occupant===emp.id;
+    const row=document.createElement('div'); row.className='graph-row';
+    const yearCol=document.createElement('div'); yearCol.className='year-col'; yearCol.textContent=y;
+    const roleTrack=document.createElement('div'); roleTrack.className='track role'; roleTrack.appendChild(makeNode(rEntry,'role'));
+    const linkCol=document.createElement('div'); linkCol.className='linkcol'+(linked?'':' no-link'); linkCol.innerHTML='<div class="bridge"></div>';
+    const personTrack=document.createElement('div'); personTrack.className='track person'; personTrack.appendChild(makeNode(eEntry,'person'));
+    row.appendChild(yearCol); row.appendChild(roleTrack); row.appendChild(linkCol); row.appendChild(personTrack);
+    container.appendChild(row);
+  });
+}
+function makeNode(entry, kind){
+  const node=document.createElement('div');
+  if(!entry){ node.className='node empty'; node.innerHTML='&nbsp;'; return node; }
+  const gap = kind==='role' ? (!entry.reportingTo || entry.headcount==null || !entry.occupant) : (!entry.manager);
+  node.className='node'+(gap?' gap':'');
+  node.innerHTML='<span class="dotmark"></span>';
+  if(kind==='role'){
+    node.innerHTML += `<div class="ttl">${entry.title||'⚠ title missing'}</div>
+      <div class="meta">${entry.reportingTo?'→ '+entry.reportingTo:'⚠ no reporting line'} · hc ${entry.headcount??'⚠'} · ${empName(entry.occupant)??'⚠ vacant'}</div>
+      <div class="evt">${entry.event||''}</div>`;
+  } else {
+    node.innerHTML += `<div class="ttl">${entry.title||'⚠ title missing'}</div>
+      <div class="meta">${entry.department||'—'} · reports to ${entry.manager||'⚠ unknown'}</div>
+      <div class="evt">${entry.event||''}</div>`;
+  }
+  return node;
+}
+function renderRolePanel(){
+  const role=roles.find(r=>r.id===selected.roleId);
+  document.getElementById('roleTitleHead').textContent = role? role.title : 'No role selected';
+  const ul=document.getElementById('roleTimeline'); ul.innerHTML='';
+  if(!role) return;
+  role.history.slice().sort((a,b)=>a.year-b.year).forEach(h=>{
+    const li=document.createElement('li');
+    li.innerHTML = `<div class="yr">${h.year}</div><div class="ti">${h.title||'<span class="missing">Title missing</span>'}</div>
+      <div class="sub">reports to ${h.reportingTo?h.reportingTo:'<span class="missing">unrecorded</span>'} · headcount ${h.headcount!=null?h.headcount:'<span class="missing">n/a</span>'} · held by ${h.occupant?empName(h.occupant):'<span class="missing">vacant</span>'}</div>
+      <div class="ev">${h.event||''}</div>`;
+    ul.appendChild(li);
+  });
+}
+function renderPersonPanel(){
+  const emp=employees.find(e=>e.id===selected.employeeId);
+  document.getElementById('personTitleHead').textContent = emp? emp.name : 'No person selected';
+  const ul=document.getElementById('personTimeline'); ul.innerHTML='';
+  if(!emp) return;
+  emp.history.slice().sort((a,b)=>a.year-b.year).forEach(h=>{
+    const li=document.createElement('li');
+    li.innerHTML = `<div class="yr">${h.year}</div><div class="ti">${h.title||'<span class="missing">Title missing</span>'}</div>
+      <div class="sub">${h.department||'—'} · manager ${h.manager?h.manager:'<span class="missing">unrecorded</span>'}</div>
+      <div class="ev">${h.event||''}</div>`;
+    ul.appendChild(li);
+  });
+}
+function answerQuery(){
+  const roleId=document.getElementById('qRole').value; const year=document.getElementById('qYear').value;
+  const role=roles.find(r=>r.id===roleId); const box=document.getElementById('queryAnswer');
+  if(!role){ box.innerHTML='Pick a role to trace.'; return; }
+  const entry=role.history.find(h=>String(h.year)===String(year));
+  if(!entry){ box.innerHTML=`No record of <b>${role.title}</b> for ${year}.`; return; }
+  if(!entry.occupant){ box.innerHTML=`In <b>${year}</b>, <b>${role.title}</b> had <span class="warn">no occupant on file</span> — reporting line: ${entry.reportingTo||'<span class="warn">unrecorded</span>'}.`; return; }
+  const person=employees.find(e=>e.id===entry.occupant);
+  if(!person){ box.innerHTML=`In <b>${year}</b>, <b>${role.title}</b> was held by occupant id "<b>${entry.occupant}</b>" — <span class="warn">unresolved</span>.`; return; }
+  const laterYears=person.history.filter(h=>h.year>Number(year)).sort((a,b)=>a.year-b.year);
+  let after = laterYears.length ? ` Afterwards, in ${laterYears[0].year} they moved to <b>${laterYears[0].title}</b> (${laterYears[0].department}) — ${laterYears[0].event||'no notes'}.` : ' No later record exists yet.';
+  box.innerHTML = `In <b>${year}</b>, <b>${role.title}</b> was held by <b>${person.name}</b>.${after}`;
+  selected.roleId=role.id; selected.employeeId=person.id;
+  renderGraph(document.getElementById('yearFilter').value); renderRolePanel(); renderPersonPanel();
+}
+
+/* ============================= ORG CHART ============================= */
+function deptClass(dept){ return 'dept-'+(dept||'').toLowerCase().replace(/[^a-z]/g,'-'); }
+function directReports(id){ return employees.filter(e=>e.managerId===id); }
+function buildOrgNode(emp){
+  const reports = directReports(emp.id);
+  let html = `<li><div class="onode ${deptClass(emp.department)}" onclick="switchView('people'); setTimeout(()=>selectProfile('${emp.id}'),0)">
+      <div class="nm">${emp.name}</div><div class="rl">${emp.title}</div>
+      <div class="hc">${reports.length} direct report${reports.length===1?'':'s'}</div>
+    </div>`;
+  if(reports.length){ html += '<ul>' + reports.map(r=>buildOrgNode(r)).join('') + '</ul>'; }
+  html += '</li>';
+  return html;
+}
+function renderOrgChart(){
+  const roots = employees.filter(e=>!e.managerId);
+  document.getElementById('orgChartContainer').innerHTML = `<ul class="otree">${roots.map(r=>buildOrgNode(r)).join('')}</ul>`;
+}
+
+/* ============================= PEOPLE ============================= */
+function renderPeople(){
+  const q=(document.getElementById('peopleSearch').value||'').toLowerCase().trim();
+  const grid=document.getElementById('peopleGrid'); grid.innerHTML='';
+  employees.filter(e=>!q||e.name.toLowerCase().includes(q)||e.title.toLowerCase().includes(q)).forEach(e=>{
+    const card=document.createElement('div'); card.className='pcard'; card.onclick=()=>selectProfile(e.id);
+    card.innerHTML = `<div class="top">${avatarHtml(e,34)}<div><div class="nm">${e.name}</div><div class="rl">${e.title}</div></div></div>
+      <div class="meta">${e.department} · since ${e.joinYear}</div>`;
+    grid.appendChild(card);
+  });
+  if(selectedProfileId) selectProfile(selectedProfileId); else document.getElementById('profileCard').classList.remove('show');
+}
+function selectProfile(id){
+  selectedProfileId = id;
+  const e = employees.find(x=>x.id===id);
+  if(!e) return;
+  document.getElementById('profileCard').classList.add('show');
+  document.getElementById('profName').textContent = e.name;
+  document.getElementById('profSub').textContent = `${e.title} · ${e.department} · since ${e.joinYear} · manager: ${e.managerId? employees.find(m=>m.id===e.managerId).name : '—'}`;
+  document.getElementById('profAvatar').outerHTML = avatarHtml(e,52).replace('class="avatar"','class="avatar" id="profAvatar"');
+
+  const hist = document.getElementById('profHistory'); hist.innerHTML='';
+  e.history.slice().sort((a,b)=>a.year-b.year).forEach(h=>{
+    const li=document.createElement('li');
+    li.innerHTML = `<div class="yr">${h.year}</div><div class="ti">${h.title||'<span class="missing">Title missing</span>'}</div>
+      <div class="sub">${h.department||'—'} · manager ${h.manager?h.manager:'<span class="missing">unrecorded</span>'}</div>
+      <div class="ev">${h.event||''}</div>`;
+    hist.appendChild(li);
+  });
+
+  const avgScore = e.performanceReviews.length ? (e.performanceReviews.reduce((s,r)=>s+r.score,0)/e.performanceReviews.length).toFixed(1) : '—';
+  document.getElementById('profSnapshot').innerHTML = `
+    <div class="kpi-row" style="grid-template-columns:1fr 1fr 1fr; margin-bottom:14px;">
+      <div class="kpi"><div class="lbl">Leave balance</div><div class="val">${e.leaveBalance}d</div></div>
+      <div class="kpi"><div class="lbl">Attendance</div><div class="val">${e.attendanceRate}%</div></div>
+      <div class="kpi"><div class="lbl">Avg. review</div><div class="val">${avgScore}</div></div>
+    </div>
+    <div style="font-size:11px;color:var(--dim);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">Recent reviews</div>
+    ${ e.performanceReviews.length ? e.performanceReviews.map(r=>`<div class="rev-card"><div class="rev-score">${r.score}</div><div class="rev-body"><b>${r.cycle}</b><div class="meta">reviewed by ${r.reviewer}</div><p>${r.summary}</p></div></div>`).join('') : '<div style="font-size:12px;color:var(--dim);">No reviews on file.</div>' }
+  `;
+  window.scrollTo({top:document.getElementById('profileCard').offsetTop-20, behavior:'smooth'});
+}
+
+/* ============================= LEAVE ============================= */
+function renderLeave(){
+  const totalPending = employees.reduce((s,e)=>s+e.leaveRequests.filter(r=>r.status==='pending').length,0);
+  const avgAttendance = (employees.reduce((s,e)=>s+e.attendanceRate,0)/employees.length).toFixed(1);
+  const totalTaken = employees.reduce((s,e)=>s+e.leaveTaken,0);
+  const totalBalance = employees.reduce((s,e)=>s+e.leaveBalance,0);
+  document.getElementById('leaveKpis').innerHTML = `
+    <div class="kpi"><div class="lbl">Pending requests</div><div class="val">${totalPending}</div></div>
+    <div class="kpi"><div class="lbl">Avg. attendance</div><div class="val">${avgAttendance}%</div></div>
+    <div class="kpi"><div class="lbl">Total leave taken</div><div class="val">${totalTaken}d</div></div>
+    <div class="kpi"><div class="lbl">Total balance left</div><div class="val">${totalBalance}d</div></div>
+  `;
+  const tbody = document.getElementById('leaveTable'); tbody.innerHTML='';
+  employees.forEach(e=>{
+    const pct = Math.round((e.leaveTaken/(e.leaveTaken+e.leaveBalance))*100);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><b>${e.name}</b></td><td>${e.department}</td><td>${e.leaveBalance}d</td>
+      <td><span class="bar-mini"><span style="width:${pct}%"></span></span>${e.leaveTaken}d</td>
+      <td>${e.attendanceRate}%</td>`;
+    tbody.appendChild(tr);
+  });
+  const reqs = document.getElementById('leaveRequests'); reqs.innerHTML='';
+  employees.forEach(e=>{
+    e.leaveRequests.forEach(r=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td><b>${e.name}</b></td><td>${r.type}</td><td>${r.dates}</td><td><span class="pill ${r.status==='approved'?'teal':r.status==='pending'?'gold':'rose'}">${r.status}</span></td>`;
+      reqs.appendChild(tr);
+    });
+  });
+}
+
+/* ============================= PERFORMANCE ============================= */
+function populatePerfFilter(){
+  const cycles = new Set();
+  employees.forEach(e=>e.performanceReviews.forEach(r=>cycles.add(r.cycle)));
+  const sel = document.getElementById('cycleFilter');
+  sel.innerHTML = '<option value="All">All cycles</option>';
+  [...cycles].sort().reverse().forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o); });
+}
+function renderPerformance(){
+  const cyc = document.getElementById('cycleFilter').value || 'All';
+  const list = document.getElementById('reviewsList'); list.innerHTML='';
+  let rows = [];
+  employees.forEach(e=> e.performanceReviews.forEach(r=> rows.push({emp:e, ...r})));
+  rows = rows.filter(r=> cyc==='All' || r.cycle===cyc).sort((a,b)=> b.cycle.localeCompare(a.cycle));
+  if(rows.length===0){ list.innerHTML = '<div style="font-size:12.5px;color:var(--dim);">No reviews for this cycle.</div>'; return; }
+  rows.forEach(r=>{
+    const div = document.createElement('div'); div.className='rev-card';
+    div.innerHTML = `<div class="rev-score">${r.score}</div><div class="rev-body"><b>${r.emp.name}</b> <span style="color:var(--dim); font-weight:400;">— ${r.emp.title}</span>
+      <div class="meta">${r.cycle} · reviewed by ${r.reviewer}</div><p>${r.summary}</p></div>`;
+    list.appendChild(div);
+  });
+}
+
+/* ============================= ANALYTICS ============================= */
+const headcountSeries = { years:[2021,2022,2023,2024,2025], Technology:[3,5,6,8,9], Product:[2,3,4,4,5] };
+const attritionSeries = [4.1, 6.8, 5.2, 9.4, 3.6];
+const hireExitSeries = { hires:[3,4,3,5,4], exits:[1,2,1,4,1] };
+function renderAnalytics(){
+  const currentHC = headcountSeries.Technology.at(-1) + headcountSeries.Product.at(-1);
+  const lastAttrition = attritionSeries.at(-1);
+  const hiresThisYear = hireExitSeries.hires.at(-1);
+  const exitsThisYear = hireExitSeries.exits.at(-1);
+  document.getElementById('analyticsKpis').innerHTML = `
+    <div class="kpi"><div class="lbl">Current headcount</div><div class="val">${currentHC}</div></div>
+    <div class="kpi"><div class="lbl">Attrition (2025)</div><div class="val">${lastAttrition}% <span class="chg bad">▲</span></div></div>
+    <div class="kpi"><div class="lbl">Hires (2025)</div><div class="val">${hiresThisYear}</div></div>
+    <div class="kpi"><div class="lbl">Exits (2025)</div><div class="val">${exitsThisYear}</div></div>
+  `;
+  const maxHC = Math.max(...headcountSeries.Technology.map((v,i)=>v+headcountSeries.Product[i]));
+  const bars = document.getElementById('headcountBars'); bars.innerHTML='';
+  headcountSeries.years.forEach((y,i)=>{
+    const t = headcountSeries.Technology[i], p = headcountSeries.Product[i];
+    const grp = document.createElement('div'); grp.className='bar-grp';
+    grp.innerHTML = `<div class="bar tech" style="height:${(t/maxHC)*100}%"></div><div class="bar prod" style="height:${(p/maxHC)*100}%"></div><span>${y}</span>`;
+    bars.appendChild(grp);
+  });
+  const maxHE = Math.max(...hireExitSeries.hires, ...hireExitSeries.exits);
+  const heBars = document.getElementById('hireExitBars'); heBars.innerHTML='';
+  headcountSeries.years.forEach((y,i)=>{
+    const grp = document.createElement('div'); grp.className='bar-grp';
+    grp.innerHTML = `<div class="bar tech" style="height:${(hireExitSeries.hires[i]/maxHE)*100}%"></div><div class="bar" style="height:${(hireExitSeries.exits[i]/maxHE)*100}%;background:linear-gradient(180deg,var(--rose),#8a3e2d)"></div><span>${y}</span>`;
+    heBars.appendChild(grp);
+  });
+  const maxA = Math.max(...attritionSeries);
+  const pts = attritionSeries.map((v,i)=> `${(i/(attritionSeries.length-1))*220},${100-(v/maxA)*90}`).join(' ');
+  document.getElementById('attritionSvg').innerHTML = `<polyline points="${pts}" fill="none" stroke="#e0616f" stroke-width="2.5"/>`;
+}
+
+/* ============================= INIT ============================= */
+detectGaps();
+populateOverviewFilters();
+populatePerfFilter();
+renderDashboard();
+</script>
+</body>
+</html>
