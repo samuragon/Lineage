@@ -291,9 +291,9 @@
         <a href="#">Resources <span class="care">▾</span></a>
         <a href="#">Pricing <span class="care">▾</span></a>
       </nav>
-      <div class="nav-actions">
-        <a class="btn btn-ghost">Sign in</a>
-        <a class="btn btn-gold">Get started</a>
+      <div class="nav-actions" id="navActions">
+        <a class="btn btn-ghost" href="loginregister.html">Sign in</a>
+        <a class="btn btn-gold" href="loginregister.html#register">Get started</a>
       </div>
     </div>
 
@@ -302,8 +302,8 @@
       <h1>Every role has a story.<br><em>Lineage</em> keeps it straight.</h1>
       <p>Track how positions change — titles, reporting lines, headcount — right alongside how people move through them. One connected history, not two disconnected spreadsheets.</p>
       <div class="hero-ctas">
-        <a class="btn btn-gold">See how it works</a>
-        <a class="btn btn-outline-hero">Try it free</a>
+        <a class="btn btn-gold" href="#why-lineage">See how it works</a>
+        <a class="btn btn-outline-hero" href="loginregister.html#register">Try it free</a>
       </div>
       <div class="hero-sub-note">No credit card · imports messy HR data as-is</div>
     </div>
@@ -402,7 +402,7 @@
   </div>
 </div>
 
-<section class="features">
+<section class="features" id="why-lineage">
   <div class="features-head">
     <span class="eyebrow-dark">Why Lineage</span>
     <h2>Two histories, finally in one place</h2>
@@ -434,14 +434,26 @@
   <h2>Bring your org's history into one line.</h2>
   <p>Import what you already have — spreadsheets, exports, even rough notes. Lineage sorts out the rest.</p>
   <div class="hero-ctas">
-    <a class="btn btn-gold">Get started free</a>
-    <a class="btn btn-outline-hero">Talk to us</a>
+    <a class="btn btn-gold" href="loginregister.html#register">Get started free</a>
+    <a class="btn btn-outline-hero" href="mailto:hello@lineage.io">Talk to us</a>
   </div>
 </div>
 
 <footer>
   <p>Lineage — an org history tool · mock marketing page</p>
 </footer>
+
+<script src="lineage-db.js"></script>
+<script>
+// Swap the nav actions if the visitor is already signed in.
+if (DB.isLoggedIn()) {
+  const user = DB.getCurrentUser();
+  document.getElementById('navActions').innerHTML = `
+    <span class="btn btn-ghost" style="cursor:default;">Hi, ${user.name.split(' ')[0]}</span>
+    <a class="btn btn-gold" href="dashboard.html">Go to Dashboard</a>
+  `;
+}
+</script>
 
 </body>
 </html>

@@ -157,7 +157,7 @@
       <div class="m"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2 L12 22 M12 2 L6 8 M12 2 L18 8 M12 22 L7 16 M12 22 L17 16" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></div>
       <b>Lineage</b>
     </div>
-    <div class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="5" rx="2"/><rect x="13" y="11" width="8" height="10" rx="2"/><rect x="3" y="14" width="8" height="7" rx="2"/></svg>Dashboard</div>
+    <div class="navitem" onclick="window.location.href='dashboard.html'" style="cursor:pointer;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="5" rx="2"/><rect x="13" y="11" width="8" height="10" rx="2"/><rect x="3" y="14" width="8" height="7" rx="2"/></svg>Dashboard</div>
     <div class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Role History</div>
     <div class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.3"/><circle cx="5" cy="19" r="2.3"/><circle cx="19" cy="19" r="2.3"/><path d="M12 7.3V13M12 13L5 16.8M12 13l7 3.8"/></svg>Org Chart</div>
     <div class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.8 20c0-3.4 2.8-6 6.2-6s6.2 2.6 6.2 6"/><circle cx="17" cy="8" r="2.6"/><path d="M15.5 14.3c2.9.4 5 2.8 5 5.7"/></svg>People</div>
@@ -166,8 +166,12 @@
     <div class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M11 20V4M18 20v-7"/></svg>Analytics</div>
     <div class="side-bottom">
       <div class="profile-mini">
-        <div class="avatar av" style="background:linear-gradient(155deg,var(--teal),var(--teal-dk));">AM</div>
-        <div><b>Amir</b><small>Admin</small></div>
+        <div class="avatar av" id="sideAvatar" style="background:linear-gradient(155deg,var(--teal),var(--teal-dk));">AM</div>
+        <div><b id="sideName">Amir</b><small id="sideTitle">Admin</small></div>
+      </div>
+      <div class="navitem" onclick="handleLogout()" style="margin-top:6px; cursor:pointer;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+        Sign out
       </div>
     </div>
   </div>
@@ -184,25 +188,25 @@
       <div class="banner-bg"></div>
       <div class="banner-body">
         <div class="banner-avatar-row">
-          <div class="big-avatar">
-            AM
+          <div class="big-avatar" id="bannerAvatar">
+            <span id="bannerAvatarText">AM</span>
             <div class="avatar-edit" title="Change photo">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17v3z"/></svg>
             </div>
           </div>
           <div class="banner-actions">
-            <button class="primary">Save changes</button>
+            <button class="primary" onclick="saveGeneral()">Save changes</button>
           </div>
         </div>
         <div class="banner-info">
-          <h2>Amir Mahmud</h2>
-          <div class="role">Admin · Technology</div>
+          <h2 id="bannerName">Amir Mahmud</h2>
+          <div class="role" id="bannerRole">Admin · Technology</div>
         </div>
         <div class="banner-meta">
-          <div class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>amir.mahmud@lineage.io</div>
-          <div class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Kuala Lumpur, MY</div>
-          <div class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Joined Mar 2021</div>
-          <div class="mi"><span class="pill teal">Active</span></div>
+          <div class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><span id="bannerEmail">amir.mahmud@lineage.io</span></div>
+          <div class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span id="bannerLocation">Kuala Lumpur, MY</span></div>
+          <div class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span id="bannerJoined">Joined Mar 2021</span></div>
+          <div class="mi"><span class="pill teal" id="bannerStatus">Active</span></div>
         </div>
       </div>
     </div>
@@ -246,38 +250,39 @@
                 <label>Full name</label>
                 <div class="input-wrap">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
-                  <input type="text" value="Amir Mahmud">
+                  <input type="text" id="fName" value="Amir Mahmud">
                 </div>
               </div>
               <div class="field">
                 <label>Job title</label>
                 <div class="input-wrap">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17v3z"/></svg>
-                  <input type="text" value="Admin">
+                  <input type="text" id="fTitle" value="Admin">
                 </div>
               </div>
               <div class="field">
                 <label>Email address</label>
                 <div class="input-wrap">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
-                  <input type="email" value="amir.mahmud@lineage.io">
+                  <input type="email" id="fEmail" value="amir.mahmud@lineage.io">
                 </div>
               </div>
               <div class="field">
                 <label>Phone number</label>
                 <div class="input-wrap">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.5 2.1L8 9.7a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2z"/></svg>
-                  <input type="text" value="+60 12-345 6789">
+                  <input type="text" id="fPhone" value="+60 12-345 6789">
                 </div>
               </div>
               <div class="field">
                 <label>Department</label>
                 <div class="input-wrap">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                  <select>
+                  <select id="fDept">
                     <option>Technology</option>
                     <option>Product</option>
                     <option>Leadership</option>
+                    <option>Unassigned</option>
                   </select>
                 </div>
               </div>
@@ -285,17 +290,18 @@
                 <label>Location</label>
                 <div class="input-wrap">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
-                  <input type="text" value="Kuala Lumpur, MY">
+                  <input type="text" id="fLocation" value="Kuala Lumpur, MY">
                 </div>
               </div>
               <div class="field full">
                 <label>Bio <span class="hint">shown on your public profile</span></label>
-                <textarea>Admin overseeing HR operations and people analytics at Lineage.</textarea>
+                <textarea id="fBio">Admin overseeing HR operations and people analytics at Lineage.</textarea>
               </div>
             </div>
             <div class="form-actions">
-              <button>Cancel</button>
-              <button class="primary">Save changes</button>
+              <span class="desc-mini" id="generalSavedMsg" style="display:none; color:var(--teal-dk); font-weight:600;">Saved ✓</span>
+              <button onclick="populateFromUser()">Cancel</button>
+              <button class="primary" onclick="saveGeneral()">Save changes</button>
             </div>
           </div>
 
@@ -306,14 +312,14 @@
                 <label>Language</label>
                 <div class="input-wrap">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>
-                  <select><option>English</option><option>Bahasa Melayu</option><option>中文</option></select>
+                  <select id="fLanguage" onchange="savePreferences()"><option>English</option><option>Bahasa Melayu</option><option>中文</option></select>
                 </div>
               </div>
               <div class="field">
                 <label>Timezone</label>
                 <div class="input-wrap">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-                  <select><option>GMT+8 — Kuala Lumpur</option><option>GMT+0 — London</option><option>GMT-5 — New York</option></select>
+                  <select id="fTimezone" onchange="savePreferences()"><option>GMT+8 — Kuala Lumpur</option><option>GMT+0 — London</option><option>GMT-5 — New York</option></select>
                 </div>
               </div>
             </div>
@@ -352,22 +358,25 @@
                 </div>
               </div>
             </div>
-            <div class="form-actions"><button class="primary">Update password</button></div>
+            <div class="form-actions">
+              <span class="desc-mini" id="pwMsg" style="display:none; font-weight:600;"></span>
+              <button class="primary" onclick="updatePassword()">Update password</button>
+            </div>
           </div>
 
           <div class="card">
             <div class="card-head"><div><h3>Two-factor authentication</h3><div class="desc-mini">Add an extra layer of security to your account.</div></div></div>
             <div class="switch-row">
               <div><b>Authenticator app</b><div class="desc-mini">Use an app like Google Authenticator or Authy.</div></div>
-              <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+              <label class="switch"><input type="checkbox" id="secAuthApp" checked onchange="saveSecurity()"><span class="slider"></span></label>
             </div>
             <div class="switch-row">
               <div><b>SMS verification</b><div class="desc-mini">Receive a one-time code via text message.</div></div>
-              <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+              <label class="switch"><input type="checkbox" id="secSms" onchange="saveSecurity()"><span class="slider"></span></label>
             </div>
             <div class="switch-row">
               <div><b>Login alerts</b><div class="desc-mini">Get notified by email on new sign-ins.</div></div>
-              <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+              <label class="switch"><input type="checkbox" id="secLoginAlerts" checked onchange="saveSecurity()"><span class="slider"></span></label>
             </div>
           </div>
         </div>
@@ -378,19 +387,19 @@
             <div class="card-head"><div><h3>Email notifications</h3><div class="desc-mini">Choose what you want to be emailed about.</div></div></div>
             <div class="switch-row">
               <div><b>Leave requests</b><div class="desc-mini">When a team member submits a leave request.</div></div>
-              <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+              <label class="switch"><input type="checkbox" id="notifLeave" checked onchange="saveNotifications()"><span class="slider"></span></label>
             </div>
             <div class="switch-row">
               <div><b>Performance reviews</b><div class="desc-mini">Reminders for upcoming and completed reviews.</div></div>
-              <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+              <label class="switch"><input type="checkbox" id="notifPerf" checked onchange="saveNotifications()"><span class="slider"></span></label>
             </div>
             <div class="switch-row">
               <div><b>Org changes</b><div class="desc-mini">Role changes, new hires, and departures.</div></div>
-              <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+              <label class="switch"><input type="checkbox" id="notifOrg" onchange="saveNotifications()"><span class="slider"></span></label>
             </div>
             <div class="switch-row">
               <div><b>Weekly digest</b><div class="desc-mini">A summary of key HR metrics every Monday.</div></div>
-              <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+              <label class="switch"><input type="checkbox" id="notifDigest" checked onchange="saveNotifications()"><span class="slider"></span></label>
             </div>
           </div>
 
@@ -398,11 +407,11 @@
             <div class="card-head"><div><h3>Push notifications</h3><div class="desc-mini">Manage alerts on your desktop and mobile.</div></div></div>
             <div class="switch-row">
               <div><b>Desktop notifications</b><div class="desc-mini">Show alerts while Lineage is open in your browser.</div></div>
-              <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+              <label class="switch"><input type="checkbox" id="notifDesktop" checked onchange="saveNotifications()"><span class="slider"></span></label>
             </div>
             <div class="switch-row">
               <div><b>Mobile push</b><div class="desc-mini">Send alerts to the Lineage mobile app.</div></div>
-              <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+              <label class="switch"><input type="checkbox" id="notifMobile" onchange="saveNotifications()"><span class="slider"></span></label>
             </div>
           </div>
         </div>
@@ -434,11 +443,11 @@
         <div class="tabpanel" id="tab-danger">
           <div class="card danger-card">
             <div class="card-head"><div><h3>Deactivate account</h3><div class="desc-mini">Temporarily disable your account. You can reactivate anytime by signing back in.</div></div></div>
-            <button class="danger-outline">Deactivate my account</button>
+            <button class="danger-outline" onclick="deactivateAccount()">Deactivate my account</button>
           </div>
           <div class="card danger-card">
             <div class="card-head"><div><h3>Delete account</h3><div class="desc-mini">Permanently delete your account and all associated data. This cannot be undone.</div></div></div>
-            <button class="danger-outline">Delete my account</button>
+            <button class="danger-outline" onclick="deleteAccount()">Delete my account</button>
           </div>
         </div>
 
@@ -448,7 +457,141 @@
   </div>
 </div>
 
+<script src="lineage-db.js"></script>
 <script>
+/* ============================= AUTH + DATA ============================= */
+const currentUser = DB.requireAuth('loginregister.html');
+
+function populateFromUser(){
+  const u = currentUser;
+  if (!u) return;
+  const initials = DB.initials(u.name);
+
+  document.getElementById('sideAvatar').textContent = initials;
+  document.getElementById('sideName').textContent = u.name.split(' ')[0];
+  document.getElementById('sideTitle').textContent = u.title;
+
+  document.getElementById('bannerAvatarText').textContent = initials;
+  document.getElementById('bannerName').textContent = u.name;
+  document.getElementById('bannerRole').textContent = `${u.title} · ${u.department}`;
+  document.getElementById('bannerEmail').textContent = u.email;
+  document.getElementById('bannerLocation').textContent = u.location;
+  document.getElementById('bannerJoined').textContent = 'Joined ' + (u.joinDate || u.joinYear);
+  document.getElementById('bannerStatus').textContent = u.status;
+
+  document.getElementById('fName').value = u.name;
+  document.getElementById('fTitle').value = u.title;
+  document.getElementById('fEmail').value = u.email;
+  document.getElementById('fPhone').value = u.phone;
+  document.getElementById('fDept').value = u.department;
+  document.getElementById('fLocation').value = u.location;
+  document.getElementById('fBio').value = u.bio;
+
+  document.getElementById('fLanguage').value = u.language;
+  document.getElementById('fTimezone').value = u.timezone;
+
+  document.getElementById('secAuthApp').checked = !!u.security.authApp;
+  document.getElementById('secSms').checked = !!u.security.sms;
+  document.getElementById('secLoginAlerts').checked = !!u.security.loginAlerts;
+
+  document.getElementById('notifLeave').checked = !!u.notifications.leaveRequests;
+  document.getElementById('notifPerf').checked = !!u.notifications.performanceReviews;
+  document.getElementById('notifOrg').checked = !!u.notifications.orgChanges;
+  document.getElementById('notifDigest').checked = !!u.notifications.weeklyDigest;
+  document.getElementById('notifDesktop').checked = !!u.notifications.desktop;
+  document.getElementById('notifMobile').checked = !!u.notifications.mobilePush;
+}
+populateFromUser();
+
+function flash(id, text){
+  const el = document.getElementById(id);
+  if (text !== undefined) el.textContent = text;
+  el.style.display = 'inline';
+  setTimeout(() => el.style.display = 'none', 2200);
+}
+
+function saveGeneral(){
+  const result = DB.updateCurrentUser({
+    name: document.getElementById('fName').value.trim(),
+    title: document.getElementById('fTitle').value.trim(),
+    email: document.getElementById('fEmail').value.trim(),
+    phone: document.getElementById('fPhone').value.trim(),
+    department: document.getElementById('fDept').value,
+    location: document.getElementById('fLocation').value.trim(),
+    bio: document.getElementById('fBio').value.trim(),
+  });
+  if (result.ok) { Object.assign(currentUser, result.user); populateFromUser(); flash('generalSavedMsg', 'Saved ✓'); }
+}
+
+function savePreferences(){
+  DB.updateCurrentUser({
+    language: document.getElementById('fLanguage').value,
+    timezone: document.getElementById('fTimezone').value,
+  });
+}
+
+function saveSecurity(){
+  DB.updateCurrentUser({
+    security: {
+      authApp: document.getElementById('secAuthApp').checked,
+      sms: document.getElementById('secSms').checked,
+      loginAlerts: document.getElementById('secLoginAlerts').checked,
+    }
+  });
+}
+
+function saveNotifications(){
+  DB.updateCurrentUser({
+    notifications: {
+      leaveRequests: document.getElementById('notifLeave').checked,
+      performanceReviews: document.getElementById('notifPerf').checked,
+      orgChanges: document.getElementById('notifOrg').checked,
+      weeklyDigest: document.getElementById('notifDigest').checked,
+      desktop: document.getElementById('notifDesktop').checked,
+      mobilePush: document.getElementById('notifMobile').checked,
+    }
+  });
+}
+
+function updatePassword(){
+  const cur = document.getElementById('curPw').value;
+  const next = document.getElementById('newPw').value;
+  const confirm = document.getElementById('confPw').value;
+  const msgEl = document.getElementById('pwMsg');
+
+  if (next !== confirm) {
+    msgEl.style.color = '#b23a48'; flash('pwMsg', 'New passwords do not match.'); return;
+  }
+  const result = DB.changePassword(cur, next);
+  if (result.ok) {
+    msgEl.style.color = 'var(--teal-dk)'; flash('pwMsg', 'Password updated ✓');
+    document.getElementById('curPw').value = '';
+    document.getElementById('newPw').value = '';
+    document.getElementById('confPw').value = '';
+  } else {
+    msgEl.style.color = '#b23a48'; flash('pwMsg', result.error);
+  }
+}
+
+function deactivateAccount(){
+  if (!confirm('Deactivate your account? You can reactivate anytime by signing back in.')) return;
+  DB.updateCurrentUser({ status: 'Deactivated' });
+  DB.logout();
+  alert('Your account has been deactivated. Sign in again anytime to reactivate it.');
+  window.location.href = 'loginregister.html';
+}
+
+function deleteAccount(){
+  if (!confirm('This permanently deletes your account and all associated data. This cannot be undone. Continue?')) return;
+  DB.deleteCurrentUser();
+  window.location.href = 'Landingpage.html';
+}
+
+function handleLogout(){
+  DB.logout();
+  window.location.href = 'loginregister.html';
+}
+
 function showTab(name){
   document.querySelectorAll('.tabpanel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + name));
   document.querySelectorAll('.sn-item').forEach(i => i.classList.toggle('active', i.dataset.tab === name));

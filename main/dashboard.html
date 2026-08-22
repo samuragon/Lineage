@@ -275,9 +275,9 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.8 20c0-3.4 2.8-6 6.2-6s6.2 2.6 6.2 6"/><circle cx="17" cy="8" r="2.6"/><path d="M15.5 14.3c2.9.4 5 2.8 5 5.7"/></svg>
       People
     </div>
-    <div class="navitem" data-view="leave" onclick="switchView('leave')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 3v3M16 3v3"/></svg>
-      Leave &amp; Attendance
+    <div class="navitem" data-view="imports" onclick="switchView('imports')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+      Import CSV
     </div>
     <div class="navitem" data-view="performance" onclick="switchView('performance')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.5 5.2 5.7.8-4.1 4 1 5.7L12 16.5l-5.1 2.7 1-5.7-4.1-4 5.7-.8z"/></svg>
@@ -288,9 +288,13 @@
       Analytics
     </div>
     <div class="side-bottom">
-      <div class="profile-mini">
-        <div class="avatar av" style="background:linear-gradient(155deg,var(--teal),var(--teal-dk));">AM</div>
-        <div><b>Amir</b><small>Admin</small></div>
+      <div class="profile-mini" id="profileMini" onclick="window.location.href='profile.html'" style="cursor:pointer;">
+        <div class="avatar av" id="sideAvatar" style="background:linear-gradient(155deg,var(--teal),var(--teal-dk));">AM</div>
+        <div><b id="sideName">Amir</b><small id="sideTitle">Admin</small></div>
+      </div>
+      <div class="navitem" onclick="handleLogout()" style="margin-top:6px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+        Sign out
       </div>
     </div>
   </div>
@@ -308,7 +312,7 @@
         <div class="top-icons">
           <div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 4.8 1c0 1.6-2.3 1.8-2.3 3.4M12 17h.01"/></svg></div>
           <div class="icon-btn"><span class="badge"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3a5 5 0 0 0-5 5v3.5L5 15h14l-2-3.5V8a5 5 0 0 0-5-5z"/><path d="M9.5 18a2.5 2.5 0 0 0 5 0"/></svg></div>
-          <div class="avatar" style="background:linear-gradient(155deg,var(--indigo),#3b46a8);">AM</div>
+          <div class="avatar" id="topAvatar" style="background:linear-gradient(155deg,var(--indigo),#3b46a8);">AM</div>
         </div>
       </div>
 
@@ -323,28 +327,17 @@
 
           <div class="chart-pair">
             <div class="card">
-              <div class="card-head">
-                <div><h3>Attendance</h3></div>
-                <div style="display:flex; align-items:center; gap:14px;">
-                  <div class="legend-row">
-                    <span class="lg"><i style="background:var(--teal)"></i>On time</span>
-                    <span class="lg"><i style="background:var(--gold)"></i>Late</span>
-                    <span class="lg"><i style="background:var(--rose)"></i>Absent</span>
-                  </div>
-                  <select><option>Last 6 months</option></select>
-                </div>
-              </div>
-              <div class="linechart"><svg id="attendanceSvg" viewBox="0 0 480 170" preserveAspectRatio="none"></svg></div>
-              <div class="axis-labels" id="attendanceAxis"></div>
-            </div>
-
-            <div class="card">
               <div class="card-head"><h3>Employee Roles</h3></div>
               <div class="donut-wrap">
                 <svg id="rolesDonut" viewBox="0 0 100 100"></svg>
                 <div class="donut-center"><b id="donutTotal">0</b><span>Employees</span></div>
                 <div class="donut-legend" id="donutLegend"></div>
               </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head"><h3>Departments</h3></div>
+              <div id="deptBreakdown"></div>
             </div>
           </div>
 
@@ -359,8 +352,8 @@
 
         <div>
           <div class="card" style="margin-bottom:16px;">
-            <div class="card-head"><h3>Employee on Leave</h3></div>
-            <ul class="side-list" id="onLeaveList"></ul>
+            <div class="card-head"><h3>Recent Imports</h3><span class="tag" onclick="switchView('imports')" style="cursor:pointer;">View all</span></div>
+            <ul class="side-list" id="recentImportsMini"></ul>
           </div>
           <div class="card" style="margin-bottom:16px;">
             <div class="card-head"><h3>Today's Reviews</h3></div>
@@ -432,22 +425,41 @@
         </div>
         <div class="profile-grid">
           <div class="card"><div class="card-head"><h3>Role history</h3></div><ul class="timeline-list" id="profHistory"></ul></div>
-          <div class="card"><div class="card-head"><h3>Leave &amp; performance snapshot</h3></div><div id="profSnapshot"></div></div>
+          <div class="card"><div class="card-head"><h3>Performance snapshot</h3></div><div id="profSnapshot"></div></div>
         </div>
       </div>
     </div>
 
-    <!-- ============ LEAVE ============ -->
-    <div class="view" id="view-leave">
-      <div class="topbar"><div><h1>Leave &amp; Attendance</h1><div class="desc">Balances, utilisation, and recent requests.</div></div></div>
-      <div class="kpi-row" id="leaveKpis"></div>
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-head"><h3>By employee</h3></div>
-        <table><thead><tr><th>Employee</th><th>Dept</th><th>Balance</th><th>Taken</th><th>Attendance</th></tr></thead><tbody id="leaveTable"></tbody></table>
+    <!-- ============ IMPORT CSV ============ -->
+    <div class="view" id="view-imports">
+      <div class="topbar">
+        <div><h1>Import HR Records</h1><div class="desc">Upload a CSV of employee records — parsed straight into the JSON database.</div></div>
+        <button onclick="downloadSampleCSV()">Download sample CSV</button>
       </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-head">
+          <div><h3>Upload a CSV file</h3><div class="desc-mini">Expected columns: name, email, title, department, managerEmail, joinDate, salary, status. Extra or missing columns are fine — only name and email are required.</div></div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <input type="file" id="csvFileInput" accept=".csv,text/csv" onchange="handleCSVFile(this)">
+        </div>
+        <div id="csvMsg" style="display:none; margin-top:14px;"></div>
+      </div>
+
+      <div class="card" id="csvPreviewCard" style="display:none; margin-bottom:16px;">
+        <div class="card-head">
+          <div><h3>Preview</h3><div class="desc-mini" id="csvPreviewDesc"></div></div>
+          <button class="primary" onclick="confirmImport()">Import records</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table id="csvPreviewTable"><thead></thead><tbody></tbody></table>
+        </div>
+      </div>
+
       <div class="card">
-        <div class="card-head"><h3>Recent requests</h3></div>
-        <table><thead><tr><th>Employee</th><th>Type</th><th>Dates</th><th>Status</th></tr></thead><tbody id="leaveRequests"></tbody></table>
+        <div class="card-head"><h3>Recent imports</h3></div>
+        <ul class="side-list" id="importLogList"></ul>
       </div>
     </div>
 
@@ -485,104 +497,33 @@
   </div>
 </div>
 
+<script src="lineage-db.js"></script>
 <script>
+/* ============================= AUTH GUARD ============================= */
+// Bounce to the login page if nobody's signed in, otherwise pull the
+// logged-in user's name/initials into the sidebar + topbar.
+const currentUser = DB.requireAuth('loginregister.html');
+
+function paintCurrentUser(){
+  if (!currentUser) return;
+  const initials = DB.initials(currentUser.name);
+  document.getElementById('sideAvatar').textContent = initials;
+  document.getElementById('sideName').textContent = currentUser.name.split(' ')[0];
+  document.getElementById('sideTitle').textContent = currentUser.title;
+  document.getElementById('topAvatar').textContent = initials;
+}
+
+function handleLogout(){
+  DB.logout();
+  window.location.href = 'loginregister.html';
+}
+
 /* ============================= DATA MODEL ============================= */
-let roles = [
-  { id:'role-se', title:'Software Engineer', department:'Technology', history:[
-    { year:2022, title:'Junior Software Engineer', reportingTo:'Nadia Rahman (Eng. Manager)', headcount:3, occupant:'amir', event:'Role created' },
-    { year:2023, title:'Junior Software Engineer', reportingTo:'Nadia Rahman (Eng. Manager)', headcount:4, occupant:'amir', event:'Headcount increased' },
-    { year:2024, title:'Software Engineer', reportingTo:'Farid Iskandar (Tech Lead)', headcount:5, occupant:'amir', event:'Redesignated; reporting line moved to Tech Lead' },
-    { year:2025, title:'Senior Software Engineer', reportingTo:'Farid Iskandar (Tech Lead)', headcount:null, occupant:'amir', event:'Title promoted — headcount not yet reported' },
-  ]},
-  { id:'role-pm', title:'Product Manager', department:'Product', history:[
-    { year:2022, title:'Associate Product Manager', reportingTo:'Suresh Kumar (Head of Product)', headcount:2, occupant:'ain', event:'Role created' },
-    { year:2023, title:'Product Manager', reportingTo:'Suresh Kumar (Head of Product)', headcount:2, occupant:'ain', event:'Promotion' },
-    { year:2024, title:'Product Manager', reportingTo:null, headcount:3, occupant:'ain', event:'Reporting line vacant — Head of Product role open' },
-    { year:2025, title:'Senior Product Manager', reportingTo:'Wei Ling (VP Product)', headcount:3, occupant:'ain', event:'Reporting line moved to VP Product' },
-  ]},
-  { id:'role-ds', title:'Data Analyst', department:'Technology', history:[
-    { year:2023, title:'Data Analyst', reportingTo:'Farid Iskandar (Tech Lead)', headcount:2, occupant:'haziq', event:'Role created' },
-    { year:2024, title:'Data Analyst', reportingTo:'Farid Iskandar (Tech Lead)', headcount:2, occupant:null, event:'No occupant on file for this year' },
-    { year:2025, title:'Senior Data Analyst', reportingTo:'Farid Iskandar (Tech Lead)', headcount:2, occupant:'haziq', event:'Promotion; role re-filled' },
-  ]},
-];
-
-let employees = [
-  { id:'zul', name:'Zul Hassan', title:'CEO', department:'Leadership', managerId:null, joinYear:2019, joinDate:'11 Feb 2019', salary:'$9,200', status:'Active',
-    leaveBalance:18, leaveTaken:4, attendanceRate:98, leaveRequests:[], performanceReviews:[],
-    history:[{year:2019, title:'CEO', department:'Leadership', manager:null, event:'Founded / took over leadership'}] },
-
-  { id:'farid', name:'Farid Iskandar', title:'Tech Lead', department:'Technology', managerId:'zul', joinYear:2020, joinDate:'03 Jun 2020', salary:'$5,400', status:'Active',
-    leaveBalance:10, leaveTaken:8, attendanceRate:95, leaveRequests:[
-      {type:'Annual leave', dates:'12–14 Aug 2026', status:'approved'},
-    ], performanceReviews:[
-      {cycle:'H1 2026', score:4.5, reviewer:'Zul Hassan', summary:'Strong technical leadership through the platform migration.'},
-    ],
-    history:[
-      {year:2020, title:'Senior Software Engineer', department:'Engineering', manager:'Zul Hassan', event:'Joined'},
-      {year:2023, title:'Tech Lead', department:'Technology', manager:'Zul Hassan', event:'Promoted; took reporting line for Engineering redesign'},
-    ]},
-
-  { id:'weiling', name:'Wei Ling', title:'VP Product', department:'Product', managerId:'zul', joinYear:2021, joinDate:'20 Sep 2021', salary:'$6,800', status:'Active',
-    leaveBalance:14, leaveTaken:3, attendanceRate:97, leaveRequests:[], performanceReviews:[
-      {cycle:'H1 2026', score:4.7, reviewer:'Zul Hassan', summary:'Rebuilt the product org after the Head of Product departure.'},
-    ],
-    history:[
-      {year:2021, title:'Senior Product Manager', department:'Product', manager:'Suresh Kumar', event:'Joined'},
-      {year:2025, title:'VP Product', department:'Product', manager:'Zul Hassan', event:'Promoted after Suresh Kumar departed'},
-    ]},
-
-  { id:'nadia', name:'Nadia Rahman', title:'Engineering Manager', department:'Technology', managerId:'zul', joinYear:2019, joinDate:'02 Apr 2019', salary:'$5,100', status:'On Leave',
-    leaveBalance:6, leaveTaken:12, attendanceRate:89, leaveRequests:[
-      {type:'Medical leave', dates:'2–3 Jul 2026', status:'approved'},
-    ], performanceReviews:[
-      {cycle:'H2 2025', score:3.2, reviewer:'Zul Hassan', summary:'Team restructured; direct reports moved under the new Tech Lead line.'},
-    ],
-    history:[
-      {year:2019, title:'Engineering Manager', department:'Engineering', manager:'Zul Hassan', event:'Joined'},
-      {year:2024, title:'Engineering Manager', department:'Engineering', manager:'Zul Hassan', event:'Team moved under Tech Lead reporting line — 0 direct reports currently'},
-    ]},
-
-  { id:'amir', name:'Amir', title:'Senior Software Engineer', department:'Technology', managerId:'farid', joinYear:2022, joinDate:'14 Mar 2022', salary:'$3,600', status:'Active',
-    leaveBalance:9, leaveTaken:6, attendanceRate:96, leaveRequests:[
-      {type:'Annual leave', dates:'20–22 Aug 2026', status:'pending'},
-      {type:'Annual leave', dates:'3–5 Mar 2026', status:'approved'},
-    ], performanceReviews:[
-      {cycle:'H1 2026', score:4.3, reviewer:'Farid Iskandar', summary:'Promoted to Senior; led the redesignation of the SE role cleanly.'},
-      {cycle:'H2 2025', score:4.0, reviewer:'Farid Iskandar', summary:'Consistent delivery, ready for more scope.'},
-    ],
-    history:[
-      { year:2022, title:'Junior Software Engineer', department:'Engineering', manager:'Nadia Rahman', event:'Joined as Junior Software Engineer' },
-      { year:2023, title:'Junior Software Engineer', department:'Engineering', manager:'Nadia Rahman', event:'Confirmed after probation' },
-      { year:2024, title:'Software Engineer', department:'Technology', manager:'Farid Iskandar', event:'Transferred from Engineering to Technology + promoted' },
-      { year:2025, title:'Senior Software Engineer', department:'Technology', manager:null, event:'Promoted to Senior — manager record missing for 2025' },
-    ]},
-
-  { id:'haziq', name:'Haziq', title:'Senior Data Analyst', department:'Technology', managerId:'farid', joinYear:2023, joinDate:'07 Jan 2023', salary:'$3,300', status:'Active',
-    leaveBalance:15, leaveTaken:2, attendanceRate:99, leaveRequests:[
-      {type:'Annual leave', dates:'1–2 Sep 2026', status:'pending'},
-    ], performanceReviews:[
-      {cycle:'H1 2026', score:4.6, reviewer:'Farid Iskandar', summary:'Promoted to Senior; strongest data quality record on the team.'},
-    ],
-    history:[
-      { year:2023, title:'Data Analyst', department:'Technology', manager:'Farid Iskandar', event:'Joined as Data Analyst' },
-      { year:2025, title:'Senior Data Analyst', department:'Technology', manager:'Farid Iskandar', event:'Promoted to Senior — 2024 record missing entirely' },
-    ]},
-
-  { id:'ain', name:'Ain', title:'Senior Product Manager', department:'Product', managerId:'weiling', joinYear:2022, joinDate:'29 Oct 2022', salary:'$4,200', status:'On Leave',
-    leaveBalance:11, leaveTaken:5, attendanceRate:94, leaveRequests:[
-      {type:'Annual leave', dates:'15–19 Sep 2026', status:'rejected'},
-    ], performanceReviews:[
-      {cycle:'H1 2026', score:4.4, reviewer:'Wei Ling', summary:'Promoted to Senior; owns the roadmap end to end now.'},
-      {cycle:'H2 2025', score:3.8, reviewer:'Suresh Kumar', summary:'Solid quarter despite manager transition.'},
-    ],
-    history:[
-      { year:2022, title:'Associate Product Manager', department:'Product', manager:'Suresh Kumar', event:'Joined as Associate PM' },
-      { year:2023, title:'Product Manager', department:'Product', manager:'Suresh Kumar', event:'Promoted to Product Manager' },
-      { year:2024, title:'Product Manager', department:'Product', manager:null, event:'Manager departed; backfill pending' },
-      { year:2025, title:'Senior Product Manager', department:'Product', manager:'Wei Ling', event:'Promoted; now reports to VP Product' },
-    ]},
-];
+// Everything below reads from the shared JSON "database" (lineage-db.js)
+// instead of hardcoded arrays, so registrations/edits made on other pages
+// show up here automatically.
+let roles = DB.getRoles();
+let employees = DB.getEmployees();
 
 let dataGaps = [];
 let selected = { roleId:null, employeeId:null };
@@ -603,7 +544,7 @@ function switchView(name){
   if(name==='overview') renderOverview();
   if(name==='orgchart') renderOrgChart();
   if(name==='people') renderPeople();
-  if(name==='leave') renderLeave();
+  if(name==='imports') renderImportLog();
   if(name==='performance') renderPerformance();
   if(name==='analytics') renderAnalytics();
 }
@@ -633,7 +574,7 @@ function detectGaps(){
 /* ============================= DASHBOARD ============================= */
 function renderDashboard(){
   const activeCount = employees.filter(e=>e.status==='Active').length;
-  const pendingLeave = employees.reduce((s,e)=>s+e.leaveRequests.filter(r=>r.status==='pending').length,0);
+  const totalCount = employees.length;
   const avgScoreAll = (employees.flatMap(e=>e.performanceReviews).reduce((s,r,_,arr)=>s+r.score/arr.length,0)).toFixed(1);
 
   document.getElementById('dashKpis').innerHTML = `
@@ -643,9 +584,9 @@ function renderDashboard(){
       <div class="val">${activeCount} <span class="chg">▲ 8%</span></div>
     </div>
     <div class="kpi">
-      <div class="kpi-top"><div class="kpi-ic" style="background:var(--gold-bg); color:#9a6a12;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 3v3M16 3v3"/></svg></div><select><option>Yearly</option><option>Monthly</option></select></div>
-      <div class="lbl">Pending leave requests</div>
-      <div class="val">${pendingLeave} <span class="chg bad">▲ 20%</span></div>
+      <div class="kpi-top"><div class="kpi-ic" style="background:var(--gold-bg); color:#9a6a12;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></div><select><option>All time</option></select></div>
+      <div class="lbl">Total employees</div>
+      <div class="val">${totalCount}</div>
     </div>
     <div class="kpi">
       <div class="kpi-top"><div class="kpi-ic" style="background:var(--indigo-bg); color:var(--indigo);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3.5l2.5 5.2 5.7.8-4.1 4 1 5.7L12 16.5l-5.1 2.7 1-5.7-4.1-4 5.7-.8z"/></svg></div><select><option>Yearly</option></select></div>
@@ -654,26 +595,23 @@ function renderDashboard(){
     </div>
   `;
 
-  renderAttendanceChart();
+  renderDeptBreakdown();
   renderRolesDonut();
   renderStatusTable();
   renderSidePanels();
 }
 
-function renderAttendanceChart(){
-  const months = ['Jan','Feb','Mar','Apr','May','Jun'];
-  const onTime = [72,78,74,82,80,88];
-  const late   = [18,14,20,10,14,8];
-  const absent = [10,8,6,8,6,4];
-  const w=480,h=170;
-  const toPts = arr => arr.map((v,i)=> `${(i/(arr.length-1))*w},${h-(v/100)*h}`).join(' ');
-  const svg = document.getElementById('attendanceSvg');
-  svg.innerHTML = `
-    <polyline points="${toPts(onTime)}" fill="none" stroke="var(--teal)" stroke-width="2.5" style="stroke:#1f9e8c"/>
-    <polyline points="${toPts(late)}" fill="none" stroke-width="2.5" style="stroke:#e8a13a"/>
-    <polyline points="${toPts(absent)}" fill="none" stroke-width="2.5" style="stroke:#e0616f"/>
-  `;
-  document.getElementById('attendanceAxis').innerHTML = months.map(m=>`<span>${m}</span>`).join('');
+function renderDeptBreakdown(){
+  const counts = {};
+  employees.forEach(e => { counts[e.department] = (counts[e.department]||0) + 1; });
+  const max = Math.max(...Object.values(counts), 1);
+  const el = document.getElementById('deptBreakdown');
+  el.innerHTML = Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([dept, n]) => `
+    <div style="margin-bottom:12px;">
+      <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px;"><b>${dept}</b><span style="color:var(--mut);">${n}</span></div>
+      <div class="bar-mini"><span style="width:${(n/max)*100}%"></span></div>
+    </div>
+  `).join('');
 }
 
 function renderRolesDonut(){
@@ -724,11 +662,11 @@ function renderStatusTable(){
 }
 
 function renderSidePanels(){
-  const onLeave = employees.filter(e=> e.leaveRequests.some(r=>r.status==='approved') );
-  document.getElementById('onLeaveList').innerHTML = onLeave.length ? onLeave.map(e=>{
-    const req = e.leaveRequests.find(r=>r.status==='approved');
-    return `<li>${avatarHtml(e,34)}<div class="body"><b>${e.name}</b><small>${req.dates} · ${req.type}</small></div></li>`;
-  }).join('') : '<li style="color:var(--mut); font-size:12px;">No one on approved leave right now.</li>';
+  const log = DB.getImportLog().slice(0, 3);
+  document.getElementById('recentImportsMini').innerHTML = log.length ? log.map(l => {
+    const when = new Date(l.when).toLocaleDateString();
+    return `<li><div class="ic" style="width:34px;height:34px;border-radius:10px;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;">📄</div><div class="body"><b>${l.fileName}</b><small>${when} · ${l.added} added, ${l.updated} updated</small></div></li>`;
+  }).join('') : '<li style="color:var(--mut); font-size:12px;">No imports yet — try the Import CSV tab.</li>';
 
   const reviewsToday = employees.filter(e=>e.performanceReviews.length).slice(0,3);
   document.getElementById('todayReviews').innerHTML = reviewsToday.map((e,i)=>{
@@ -908,10 +846,9 @@ function selectProfile(id){
 
   const avgScore = e.performanceReviews.length ? (e.performanceReviews.reduce((s,r)=>s+r.score,0)/e.performanceReviews.length).toFixed(1) : '—';
   document.getElementById('profSnapshot').innerHTML = `
-    <div class="kpi-row" style="grid-template-columns:1fr 1fr 1fr; margin-bottom:14px;">
-      <div class="kpi"><div class="lbl">Leave balance</div><div class="val">${e.leaveBalance}d</div></div>
-      <div class="kpi"><div class="lbl">Attendance</div><div class="val">${e.attendanceRate}%</div></div>
-      <div class="kpi"><div class="lbl">Avg. review</div><div class="val">${avgScore}</div></div>
+    <div class="kpi-row" style="grid-template-columns:1fr 1fr; margin-bottom:14px;">
+      <div class="kpi"><div class="lbl">Avg. review score</div><div class="val">${avgScore}</div></div>
+      <div class="kpi"><div class="lbl">Status</div><div class="val" style="font-size:16px;">${e.status}</div></div>
     </div>
     <div style="font-size:11px;color:var(--dim);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">Recent reviews</div>
     ${ e.performanceReviews.length ? e.performanceReviews.map(r=>`<div class="rev-card"><div class="rev-score">${r.score}</div><div class="rev-body"><b>${r.cycle}</b><div class="meta">reviewed by ${r.reviewer}</div><p>${r.summary}</p></div></div>`).join('') : '<div style="font-size:12px;color:var(--dim);">No reviews on file.</div>' }
@@ -919,35 +856,125 @@ function selectProfile(id){
   window.scrollTo({top:document.getElementById('profileCard').offsetTop-20, behavior:'smooth'});
 }
 
-/* ============================= LEAVE ============================= */
-function renderLeave(){
-  const totalPending = employees.reduce((s,e)=>s+e.leaveRequests.filter(r=>r.status==='pending').length,0);
-  const avgAttendance = (employees.reduce((s,e)=>s+e.attendanceRate,0)/employees.length).toFixed(1);
-  const totalTaken = employees.reduce((s,e)=>s+e.leaveTaken,0);
-  const totalBalance = employees.reduce((s,e)=>s+e.leaveBalance,0);
-  document.getElementById('leaveKpis').innerHTML = `
-    <div class="kpi"><div class="lbl">Pending requests</div><div class="val">${totalPending}</div></div>
-    <div class="kpi"><div class="lbl">Avg. attendance</div><div class="val">${avgAttendance}%</div></div>
-    <div class="kpi"><div class="lbl">Total leave taken</div><div class="val">${totalTaken}d</div></div>
-    <div class="kpi"><div class="lbl">Total balance left</div><div class="val">${totalBalance}d</div></div>
-  `;
-  const tbody = document.getElementById('leaveTable'); tbody.innerHTML='';
-  employees.forEach(e=>{
-    const pct = Math.round((e.leaveTaken/(e.leaveTaken+e.leaveBalance))*100);
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td><b>${e.name}</b></td><td>${e.department}</td><td>${e.leaveBalance}d</td>
-      <td><span class="bar-mini"><span style="width:${pct}%"></span></span>${e.leaveTaken}d</td>
-      <td>${e.attendanceRate}%</td>`;
-    tbody.appendChild(tr);
+/* ============================= IMPORT CSV ============================= */
+let parsedCsvRecords = [];
+let parsedCsvFileName = '';
+
+/** minimal RFC4180-ish CSV parser: handles quoted fields, commas & quotes inside quotes */
+function parseCSV(text){
+  const rows = [];
+  let row = [], field = '', inQuotes = false;
+  for (let i = 0; i < text.length; i++){
+    const c = text[i], next = text[i+1];
+    if (inQuotes){
+      if (c === '"' && next === '"'){ field += '"'; i++; }
+      else if (c === '"'){ inQuotes = false; }
+      else { field += c; }
+    } else {
+      if (c === '"'){ inQuotes = true; }
+      else if (c === ','){ row.push(field); field=''; }
+      else if (c === '\r'){ /* skip */ }
+      else if (c === '\n'){ row.push(field); rows.push(row); row=[]; field=''; }
+      else { field += c; }
+    }
+  }
+  if (field.length || row.length){ row.push(field); rows.push(row); }
+  const nonEmpty = rows.filter(r => r.some(v => v.trim() !== ''));
+  if (!nonEmpty.length) return { headers:[], records:[] };
+  const headers = nonEmpty[0].map(h => h.trim());
+  const records = nonEmpty.slice(1).map(r => {
+    const obj = {};
+    headers.forEach((h,i) => obj[h] = (r[i] || '').trim());
+    return obj;
   });
-  const reqs = document.getElementById('leaveRequests'); reqs.innerHTML='';
-  employees.forEach(e=>{
-    e.leaveRequests.forEach(r=>{
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td><b>${e.name}</b></td><td>${r.type}</td><td>${r.dates}</td><td><span class="pill ${r.status==='approved'?'teal':r.status==='pending'?'gold':'rose'}">${r.status}</span></td>`;
-      reqs.appendChild(tr);
-    });
-  });
+  return { headers, records };
+}
+
+function handleCSVFile(input){
+  const file = input.files[0];
+  if (!file) return;
+  parsedCsvFileName = file.name;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const { headers, records } = parseCSV(e.target.result);
+    parsedCsvRecords = records;
+    renderCsvPreview(headers, records);
+  };
+  reader.onerror = () => showCsvMsg('Could not read that file. Please try again.', 'error');
+  reader.readAsText(file);
+}
+
+function renderCsvPreview(headers, records){
+  const card = document.getElementById('csvPreviewCard');
+  if (!records.length){
+    card.style.display = 'none';
+    showCsvMsg('No rows found in that CSV.', 'error');
+    return;
+  }
+  document.getElementById('csvMsg').style.display = 'none';
+  card.style.display = 'block';
+  document.getElementById('csvPreviewDesc').textContent = `${records.length} row(s) found in ${parsedCsvFileName}. Review below, then import.`;
+
+  const thead = document.querySelector('#csvPreviewTable thead');
+  const tbody = document.querySelector('#csvPreviewTable tbody');
+  thead.innerHTML = `<tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr>`;
+  tbody.innerHTML = records.slice(0, 20).map(r =>
+    `<tr>${headers.map(h=>`<td>${r[h] || '<span class="missing">—</span>'}</td>`).join('')}</tr>`
+  ).join('');
+  if (records.length > 20){
+    tbody.innerHTML += `<tr><td colspan="${headers.length}" style="color:var(--dim); font-style:italic;">…and ${records.length-20} more row(s)</td></tr>`;
+  }
+}
+
+function showCsvMsg(text, kind){
+  const el = document.getElementById('csvMsg');
+  el.style.display = 'block';
+  el.style.color = kind === 'error' ? '#b23a48' : 'var(--teal-dk)';
+  el.innerHTML = text;
+}
+
+function confirmImport(){
+  if (!parsedCsvRecords.length) return;
+  const result = DB.importEmployees(parsedCsvRecords, parsedCsvFileName);
+  employees = DB.getEmployees(); // refresh the in-memory copy from the JSON db
+
+  let msg = `Imported: <b>${result.added}</b> new, <b>${result.updated}</b> updated.`;
+  if (result.errors.length){
+    msg += `<br><span style="color:#b23a48;">${result.errors.length} issue(s):</span><ul style="margin:6px 0 0 18px; padding:0;">${result.errors.map(e=>`<li>${e}</li>`).join('')}</ul>`;
+  }
+  showCsvMsg(msg, result.errors.length ? 'error' : 'success');
+
+  document.getElementById('csvPreviewCard').style.display = 'none';
+  document.getElementById('csvFileInput').value = '';
+  parsedCsvRecords = [];
+
+  renderImportLog();
+  detectGaps();
+  populateOverviewFilters();
+  renderDashboard(); // headcount/KPIs may have changed
+}
+
+function renderImportLog(){
+  const log = DB.getImportLog();
+  const list = document.getElementById('importLogList');
+  if (!list) return;
+  list.innerHTML = log.length ? log.map(l => {
+    const when = new Date(l.when).toLocaleString();
+    return `<li><div class="ic" style="width:34px;height:34px;border-radius:10px;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;">📄</div>
+      <div class="body"><b>${l.fileName}</b><small>${when} · ${l.added} added, ${l.updated} updated${l.errorCount ? `, ${l.errorCount} issue(s)` : ''}</small></div></li>`;
+  }).join('') : '<li style="color:var(--mut); font-size:12px;">No imports yet — upload a CSV to get started.</li>';
+}
+
+function downloadSampleCSV(){
+  const sample = 'name,email,title,department,managerEmail,joinDate,salary,status\n' +
+    'Siti Rahman,siti.rahman@lineage.io,Product Designer,Product,weiling@lineage.io,15 Jan 2026,3800,Active\n' +
+    'Kumar Selvam,kumar.selvam@lineage.io,QA Engineer,Technology,farid@lineage.io,02 Feb 2026,3200,Active\n';
+  const blob = new Blob([sample], { type:'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'lineage-sample-import.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
 }
 
 /* ============================= PERFORMANCE ============================= */
@@ -1009,6 +1036,7 @@ function renderAnalytics(){
 }
 
 /* ============================= INIT ============================= */
+paintCurrentUser();
 detectGaps();
 populateOverviewFilters();
 populatePerfFilter();
