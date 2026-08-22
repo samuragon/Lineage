@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lineage — My Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f3f4f8; --card:#ffffff; --line:#eceef3;
+    --ink:#1c1e2a; --mut:#8b8fa3; --dim:#b3b6c6;
+    --teal:#1f9e8c; --teal-bg:#e5f5f1; --teal-dk:#146356;
+    --gold:#e8a13a; --gold-bg:#fdf1de;
+    --indigo:#5b6fe0; --indigo-bg:#eaecfc;
+    --rose:#e0616f; --rose-bg:#fbe6e8;
+    --slate:#6b7280; --slate-bg:#eef0f3;
+    --serif:'Fraunces', serif; --sans:'Inter', sans-serif; --mono:'JetBrains Mono', monospace;
+    --radius:16px; --shadow:0 1px 2px rgba(20,20,40,0.04), 0 10px 30px -22px rgba(20,20,40,0.20);
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{ font-family:var(--sans); background:var(--bg); color:var(--ink); font-size:14px; -webkit-font-smoothing:antialiased; }
+  a{ color:inherit; }
+  button, select, input, textarea{ font-family:var(--sans); }
+
+  .shell{ display:grid; grid-template-columns:224px 1fr; min-height:100vh; }
+
+  /* ---------- Sidebar (shared with dashboard) ---------- */
+  .side{ background:var(--card); border-right:1px solid var(--line); padding:20px 14px; position:sticky; top:0; height:100vh; display:flex; flex-direction:column; }
+  .brandmini{ display:flex; align-items:center; gap:10px; padding:4px 8px 22px; }
+  .brandmini .m{ width:32px; height:32px; border-radius:9px; background:linear-gradient(155deg, var(--teal), var(--teal-dk)); display:flex; align-items:center; justify-content:center; }
+  .brandmini .m svg{ width:17px; height:17px; }
+  .brandmini b{ font-family:var(--serif); font-size:18px; }
+  .navitem{ display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:11px; font-size:13.5px; color:var(--mut); margin-bottom:3px; cursor:pointer; font-weight:500; }
+  .navitem svg{ width:17px; height:17px; flex-shrink:0; }
+  .navitem:hover{ background:var(--bg); color:var(--ink); }
+  .navitem.active{ background:var(--teal); color:#fff; font-weight:600; }
+  .side-bottom{ margin-top:auto; }
+  .profile-mini{ display:flex; align-items:center; gap:10px; padding:12px 10px; border-radius:12px; background:var(--bg); cursor:pointer; }
+  .profile-mini .av{ width:32px; height:32px; }
+  .profile-mini b{ font-size:12.5px; display:block; }
+  .profile-mini small{ color:var(--mut); font-size:10.5px; }
+
+  /* ---------- Main / shared ---------- */
+  .main{ padding:24px 32px 60px; max-width:1080px; }
+  .topbar{ display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:22px; flex-wrap:wrap; }
+  .topbar h1{ font-family:var(--serif); font-size:25px; margin:0; }
+  .topbar .desc{ font-size:12.5px; color:var(--mut); margin-top:3px; }
+
+  select{ font-size:12.5px; padding:8px 11px; border-radius:9px; border:1px solid var(--line); background:#fff; color:var(--ink); }
+  button{ font-size:12.5px; font-weight:600; padding:9px 16px; border-radius:9px; border:1px solid var(--line); background:#fff; cursor:pointer; }
+  button:hover{ border-color:var(--teal); color:var(--teal-dk); }
+  button.primary{ background:var(--teal); border-color:var(--teal); color:#fff; }
+  button.primary:hover{ background:var(--teal-dk); color:#fff; border-color:var(--teal-dk); }
+  button.danger-outline{ border-color:#f0c7ca; color:var(--rose); background:#fff; }
+  button.danger-outline:hover{ background:var(--rose-bg); border-color:var(--rose); color:#b23a48; }
+
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:20px 22px; box-shadow:var(--shadow); }
+  .card-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .card-head h3{ font-family:var(--serif); font-size:15.5px; margin:0; }
+  .card-head .desc-mini{ font-size:11.5px; color:var(--mut); margin-top:2px; }
+  .tag{ font-family:var(--mono); font-size:10px; color:var(--mut); background:var(--bg); padding:4px 10px; border-radius:100px; }
+
+  .avatar{ width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; color:#fff; flex-shrink:0; }
+  .pill{ font-size:10.5px; font-weight:600; padding:4px 10px; border-radius:100px; display:inline-flex; align-items:center; gap:5px; }
+  .pill.teal{ background:var(--teal-bg); color:var(--teal-dk); }
+  .pill.gold{ background:var(--gold-bg); color:#8a6412; }
+  .pill.indigo{ background:var(--indigo-bg); color:#3b46a8; }
+
+  /* ---------- Profile header ---------- */
+  .profile-banner{ position:relative; border-radius:var(--radius); overflow:hidden; margin-bottom:64px; box-shadow:var(--shadow); border:1px solid var(--line); }
+  .banner-bg{ height:120px; background:linear-gradient(150deg, var(--teal-dk), var(--teal) 60%, #21a892); position:relative; }
+  .banner-bg::before{ content:''; position:absolute; inset:0; background-image:radial-gradient(circle at 85% 20%, rgba(255,255,255,0.14), transparent 45%); }
+  .banner-body{ background:var(--card); padding:0 24px 20px; }
+  .banner-avatar-row{ display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-top:-46px; padding-bottom:14px; flex-wrap:wrap; }
+  .big-avatar{ width:92px; height:92px; border-radius:50%; border:4px solid var(--card); display:flex; align-items:center; justify-content:center; font-family:var(--serif); font-weight:600; font-size:30px; color:#fff; background:linear-gradient(155deg,var(--indigo),#3b46a8); box-shadow:var(--shadow); position:relative; }
+  .avatar-edit{ position:absolute; bottom:2px; right:2px; width:26px; height:26px; border-radius:50%; background:var(--card); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .avatar-edit svg{ width:13px; height:13px; color:var(--mut); }
+  .banner-actions{ display:flex; gap:8px; padding-bottom:8px; }
+  .banner-info h2{ font-family:var(--serif); font-size:22px; margin:12px 0 2px; }
+  .banner-info .role{ font-size:12.5px; color:var(--mut); }
+  .banner-meta{ display:flex; gap:18px; flex-wrap:wrap; margin-top:14px; padding-top:14px; border-top:1px solid var(--line); }
+  .banner-meta .mi{ display:flex; align-items:center; gap:7px; font-size:12px; color:var(--mut); }
+  .banner-meta svg{ width:14px; height:14px; color:var(--dim); flex-shrink:0; }
+
+  /* ---------- Tabs ---------- */
+  .settings-layout{ display:grid; grid-template-columns:196px 1fr; gap:24px; align-items:start; }
+  @media (max-width:820px){ .settings-layout{ grid-template-columns:1fr; } }
+  .settings-nav{ display:flex; flex-direction:column; gap:3px; position:sticky; top:24px; }
+  .settings-nav .sn-item{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; font-size:12.5px; font-weight:500; color:var(--mut); cursor:pointer; }
+  .settings-nav .sn-item svg{ width:16px; height:16px; flex-shrink:0; }
+  .settings-nav .sn-item:hover{ background:#fff; color:var(--ink); }
+  .settings-nav .sn-item.active{ background:var(--card); color:var(--teal-dk); font-weight:600; box-shadow:var(--shadow); border:1px solid var(--line); }
+
+  .tabpanel{ display:none; flex-direction:column; gap:16px; }
+  .tabpanel.active{ display:flex; }
+
+  /* ---------- Form fields ---------- */
+  .field-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px 16px; }
+  @media (max-width:600px){ .field-grid{ grid-template-columns:1fr; } }
+  .field{ margin-bottom:2px; }
+  .field.full{ grid-column:1 / -1; }
+  .field label{ display:block; font-size:11.5px; font-weight:600; color:var(--ink); margin-bottom:6px; }
+  .field .hint{ font-size:10.5px; color:var(--dim); font-weight:400; margin-left:4px; }
+  .input-wrap{ position:relative; }
+  .input-wrap svg{ position:absolute; left:13px; top:13px; width:15px; height:15px; color:var(--dim); pointer-events:none; }
+  .input-wrap input, .input-wrap select, textarea{
+    width:100%; padding:10px 14px 10px 38px; border-radius:10px; border:1px solid var(--line);
+    background:var(--bg); font-size:13px; color:var(--ink); outline:none; transition:border-color .15s, background .15s;
+  }
+  .input-wrap select{ appearance:none; }
+  textarea{ padding:12px 14px; min-height:84px; resize:vertical; font-family:var(--sans); }
+  .input-wrap input::placeholder{ color:var(--dim); }
+  .input-wrap input:focus, textarea:focus, .input-wrap select:focus{ border-color:var(--teal); background:#fff; }
+  .toggle-eye{ position:absolute; right:12px; top:11px; cursor:pointer; color:var(--dim); display:flex; }
+  .toggle-eye svg{ width:15px; height:15px; }
+
+  .divider-line{ height:1px; background:var(--line); margin:6px 0; }
+
+  .form-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:4px; }
+
+  /* ---------- Toggle switch ---------- */
+  .switch-row{ display:flex; align-items:center; justify-content:space-between; padding:13px 0; border-bottom:1px solid var(--line); gap:16px; }
+  .switch-row:last-child{ border-bottom:none; }
+  .switch-row b{ font-size:12.5px; display:block; }
+  .switch-row .desc-mini{ font-size:11.5px; color:var(--mut); margin-top:2px; }
+  .switch{ position:relative; width:38px; height:22px; flex-shrink:0; }
+  .switch input{ opacity:0; width:0; height:0; }
+  .switch .slider{ position:absolute; inset:0; background:var(--line); border-radius:100px; cursor:pointer; transition:background .15s; }
+  .switch .slider::before{ content:''; position:absolute; width:16px; height:16px; left:3px; top:3px; background:#fff; border-radius:50%; transition:transform .15s; box-shadow:0 1px 2px rgba(0,0,0,0.15); }
+  .switch input:checked + .slider{ background:var(--teal); }
+  .switch input:checked + .slider::before{ transform:translateX(16px); }
+
+  /* ---------- Session rows ---------- */
+  .session-row{ display:flex; align-items:center; gap:14px; padding:13px 0; border-bottom:1px solid var(--line); }
+  .session-row:last-child{ border-bottom:none; }
+  .session-ic{ width:36px; height:36px; border-radius:10px; background:var(--bg); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .session-ic svg{ width:17px; height:17px; color:var(--mut); }
+  .session-row b{ font-size:12.5px; }
+  .session-row .meta{ font-size:11px; color:var(--dim); font-family:var(--mono); margin-top:2px; }
+  .session-row .curr{ margin-left:auto; }
+
+  .pw-meter{ display:flex; gap:4px; margin-top:8px; }
+  .pw-meter i{ height:3px; flex:1; border-radius:3px; background:var(--line); }
+  .pw-meter span{ font-size:10.5px; color:var(--dim); display:block; margin-top:6px; font-family:var(--mono); }
+
+  .danger-card{ border-color:#f0c7ca; }
+  .danger-card .card-head h3{ color:#b23a48; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="side">
+    <div class="brandmini">
+      <div class="m"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2 L12 22 M12 2 L6 8 M12 2 L18 8 M12 22 L7 16 M12 22 L17 16" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <b>Lineage</b>
+    </div>
+    <div class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="5" rx="2"/><rect x="13" y="11" width="8" height="10" rx="2"/><rect x="3" y="14" width="8" height="7" rx="2"/></svg>Dashboard</div>
+    <div class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Role History</div>
+    <div class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.3"/><circle cx="5" cy="19" r="2.3"/><circle cx="19" cy="19" r="2.3"/><path d="M12 7.3V13M12 13L5 16.8M12 13l7 3.8"/></svg>Org Chart</div>
+    <div class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.8 20c0-3.4 2.8-6 6.2-6s6.2 2.6 6.2 6"/><circle cx="17" cy="8" r="2.6"/><path d="M15.5 14.3c2.9.4 5 2.8 5 5.7"/></svg>People</div>
+    <div class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 3v3M16 3v3"/></svg>Leave &amp; Attendance</div>
+    <div class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.5 5.2 5.7.8-4.1 4 1 5.7L12 16.5l-5.1 2.7 1-5.7-4.1-4 5.7-.8z"/></svg>Performance</div>
+    <div class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M11 20V4M18 20v-7"/></svg>Analytics</div>
+    <div class="side-bottom">
+      <div class="profile-mini">
+        <div class="avatar av" style="background:linear-gradient(155deg,var(--teal),var(--teal-dk));">AM</div>
+        <div><b>Amir</b><small>Admin</small></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <div class="topbar">
+      <div><h1>My Profile</h1><div class="desc">Manage your personal information, security, and preferences.</div></div>
+      <span class="tag">Last updated 2 days ago</span>
+    </div>
+
+    <!-- ============ PROFILE BANNER ============ -->
+    <div class="profile-banner">
+      <div class="banner-bg"></div>
+      <div class="banner-body">
+        <div class="banner-avatar-row">
+          <div class="big-avatar">
+            AM
+            <div class="avatar-edit" title="Change photo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17v3z"/></svg>
+            </div>
+          </div>
+          <div class="banner-actions">
+            <button class="primary">Save changes</button>
+          </div>
+        </div>
+        <div class="banner-info">
+          <h2>Amir Mahmud</h2>
+          <div class="role">Admin · Technology</div>
+        </div>
+        <div class="banner-meta">
+          <div class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>amir.mahmud@lineage.io</div>
+          <div class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Kuala Lumpur, MY</div>
+          <div class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Joined Mar 2021</div>
+          <div class="mi"><span class="pill teal">Active</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ SETTINGS LAYOUT ============ -->
+    <div class="settings-layout">
+
+      <div class="settings-nav">
+        <div class="sn-item active" data-tab="general" onclick="showTab('general')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+          General
+        </div>
+        <div class="sn-item" data-tab="security" onclick="showTab('security')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+          Security
+        </div>
+        <div class="sn-item" data-tab="notifications" onclick="showTab('notifications')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3a5 5 0 0 0-5 5v3.5L5 15h14l-2-3.5V8a5 5 0 0 0-5-5z"/><path d="M9.5 18a2.5 2.5 0 0 0 5 0"/></svg>
+          Notifications
+        </div>
+        <div class="sn-item" data-tab="sessions" onclick="showTab('sessions')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg>
+          Sessions
+        </div>
+        <div class="sn-item" data-tab="danger" onclick="showTab('danger')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01M10.3 3.9L2.5 18a1.6 1.6 0 0 0 1.4 2.4h16.2a1.6 1.6 0 0 0 1.4-2.4L13.7 3.9a1.6 1.6 0 0 0-2.8 0z"/></svg>
+          Danger Zone
+        </div>
+      </div>
+
+      <div class="tab-content">
+
+        <!-- ---------- GENERAL ---------- -->
+        <div class="tabpanel active" id="tab-general">
+          <div class="card">
+            <div class="card-head">
+              <div><h3>Personal information</h3><div class="desc-mini">Update your name, contact details, and role.</div></div>
+            </div>
+            <div class="field-grid">
+              <div class="field">
+                <label>Full name</label>
+                <div class="input-wrap">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+                  <input type="text" value="Amir Mahmud">
+                </div>
+              </div>
+              <div class="field">
+                <label>Job title</label>
+                <div class="input-wrap">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17v3z"/></svg>
+                  <input type="text" value="Admin">
+                </div>
+              </div>
+              <div class="field">
+                <label>Email address</label>
+                <div class="input-wrap">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+                  <input type="email" value="amir.mahmud@lineage.io">
+                </div>
+              </div>
+              <div class="field">
+                <label>Phone number</label>
+                <div class="input-wrap">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.5 2.1L8 9.7a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2z"/></svg>
+                  <input type="text" value="+60 12-345 6789">
+                </div>
+              </div>
+              <div class="field">
+                <label>Department</label>
+                <div class="input-wrap">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                  <select>
+                    <option>Technology</option>
+                    <option>Product</option>
+                    <option>Leadership</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <label>Location</label>
+                <div class="input-wrap">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+                  <input type="text" value="Kuala Lumpur, MY">
+                </div>
+              </div>
+              <div class="field full">
+                <label>Bio <span class="hint">shown on your public profile</span></label>
+                <textarea>Admin overseeing HR operations and people analytics at Lineage.</textarea>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button>Cancel</button>
+              <button class="primary">Save changes</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><div><h3>Preferences</h3><div class="desc-mini">Language, timezone, and formatting.</div></div></div>
+            <div class="field-grid">
+              <div class="field">
+                <label>Language</label>
+                <div class="input-wrap">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>
+                  <select><option>English</option><option>Bahasa Melayu</option><option>中文</option></select>
+                </div>
+              </div>
+              <div class="field">
+                <label>Timezone</label>
+                <div class="input-wrap">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+                  <select><option>GMT+8 — Kuala Lumpur</option><option>GMT+0 — London</option><option>GMT-5 — New York</option></select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ---------- SECURITY ---------- -->
+        <div class="tabpanel" id="tab-security">
+          <div class="card">
+            <div class="card-head"><div><h3>Change password</h3><div class="desc-mini">Use at least 8 characters, with a mix of letters, numbers, and symbols.</div></div></div>
+            <div class="field-grid">
+              <div class="field full">
+                <label>Current password</label>
+                <div class="input-wrap">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                  <input type="password" id="curPw" placeholder="Enter current password">
+                  <span class="toggle-eye" onclick="toggleVis('curPw')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></span>
+                </div>
+              </div>
+              <div class="field">
+                <label>New password</label>
+                <div class="input-wrap">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                  <input type="password" id="newPw" placeholder="Create new password" oninput="pwStrength(this.value)">
+                  <span class="toggle-eye" onclick="toggleVis('newPw')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></span>
+                </div>
+                <div class="pw-meter"><i id="pwBar1"></i><i id="pwBar2"></i><i id="pwBar3"></i><i id="pwBar4"></i></div>
+                <span id="pwLabel">Password strength</span>
+              </div>
+              <div class="field">
+                <label>Confirm new password</label>
+                <div class="input-wrap">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                  <input type="password" id="confPw" placeholder="Re-enter new password">
+                  <span class="toggle-eye" onclick="toggleVis('confPw')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></span>
+                </div>
+              </div>
+            </div>
+            <div class="form-actions"><button class="primary">Update password</button></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><div><h3>Two-factor authentication</h3><div class="desc-mini">Add an extra layer of security to your account.</div></div></div>
+            <div class="switch-row">
+              <div><b>Authenticator app</b><div class="desc-mini">Use an app like Google Authenticator or Authy.</div></div>
+              <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+            </div>
+            <div class="switch-row">
+              <div><b>SMS verification</b><div class="desc-mini">Receive a one-time code via text message.</div></div>
+              <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+            </div>
+            <div class="switch-row">
+              <div><b>Login alerts</b><div class="desc-mini">Get notified by email on new sign-ins.</div></div>
+              <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- ---------- NOTIFICATIONS ---------- -->
+        <div class="tabpanel" id="tab-notifications">
+          <div class="card">
+            <div class="card-head"><div><h3>Email notifications</h3><div class="desc-mini">Choose what you want to be emailed about.</div></div></div>
+            <div class="switch-row">
+              <div><b>Leave requests</b><div class="desc-mini">When a team member submits a leave request.</div></div>
+              <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+            </div>
+            <div class="switch-row">
+              <div><b>Performance reviews</b><div class="desc-mini">Reminders for upcoming and completed reviews.</div></div>
+              <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+            </div>
+            <div class="switch-row">
+              <div><b>Org changes</b><div class="desc-mini">Role changes, new hires, and departures.</div></div>
+              <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+            </div>
+            <div class="switch-row">
+              <div><b>Weekly digest</b><div class="desc-mini">A summary of key HR metrics every Monday.</div></div>
+              <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><div><h3>Push notifications</h3><div class="desc-mini">Manage alerts on your desktop and mobile.</div></div></div>
+            <div class="switch-row">
+              <div><b>Desktop notifications</b><div class="desc-mini">Show alerts while Lineage is open in your browser.</div></div>
+              <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+            </div>
+            <div class="switch-row">
+              <div><b>Mobile push</b><div class="desc-mini">Send alerts to the Lineage mobile app.</div></div>
+              <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- ---------- SESSIONS ---------- -->
+        <div class="tabpanel" id="tab-sessions">
+          <div class="card">
+            <div class="card-head"><div><h3>Active sessions</h3><div class="desc-mini">Devices currently signed in to your account.</div></div><button>Sign out all</button></div>
+
+            <div class="session-row">
+              <div class="session-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg></div>
+              <div><b>MacBook Pro — Chrome</b><div class="meta">Kuala Lumpur, MY · Active now</div></div>
+              <span class="pill teal curr">This device</span>
+            </div>
+            <div class="session-row">
+              <div class="session-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 18h4"/></svg></div>
+              <div><b>iPhone 15 — Lineage App</b><div class="meta">Kuala Lumpur, MY · 2 hours ago</div></div>
+              <button class="curr">Sign out</button>
+            </div>
+            <div class="session-row">
+              <div class="session-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg></div>
+              <div><b>Windows PC — Edge</b><div class="meta">Singapore, SG · 3 days ago</div></div>
+              <button class="curr">Sign out</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ---------- DANGER ZONE ---------- -->
+        <div class="tabpanel" id="tab-danger">
+          <div class="card danger-card">
+            <div class="card-head"><div><h3>Deactivate account</h3><div class="desc-mini">Temporarily disable your account. You can reactivate anytime by signing back in.</div></div></div>
+            <button class="danger-outline">Deactivate my account</button>
+          </div>
+          <div class="card danger-card">
+            <div class="card-head"><div><h3>Delete account</h3><div class="desc-mini">Permanently delete your account and all associated data. This cannot be undone.</div></div></div>
+            <button class="danger-outline">Delete my account</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function showTab(name){
+  document.querySelectorAll('.tabpanel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + name));
+  document.querySelectorAll('.sn-item').forEach(i => i.classList.toggle('active', i.dataset.tab === name));
+}
+
+function toggleVis(id){
+  const input = document.getElementById(id);
+  input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+function pwStrength(val){
+  const bars = [document.getElementById('pwBar1'), document.getElementById('pwBar2'), document.getElementById('pwBar3'), document.getElementById('pwBar4')];
+  const label = document.getElementById('pwLabel');
+  let score = 0;
+  if(val.length >= 8) score++;
+  if(/[A-Z]/.test(val) && /[a-z]/.test(val)) score++;
+  if(/[0-9]/.test(val)) score++;
+  if(/[^A-Za-z0-9]/.test(val)) score++;
+
+  const colors = ['var(--rose)', 'var(--gold)', 'var(--teal)', 'var(--teal-dk)'];
+  const labels = ['Too weak', 'Weak', 'Good', 'Strong'];
+
+  bars.forEach((b,i)=> b.style.background = i < score ? colors[score-1] : 'var(--line)');
+  label.textContent = val.length === 0 ? 'Password strength' : labels[Math.max(score-1,0)];
+  label.style.color = val.length === 0 ? 'var(--dim)' : colors[Math.max(score-1,0)];
+}
+</script>
+</body>
+</html>
