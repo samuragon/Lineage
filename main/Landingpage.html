@@ -3,805 +3,445 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Setel OrgHistory</title>
+<title>Lineage — Trace how roles and people evolve</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0a1618;
-    --bg-raised:#0f2023;
-    --surface:#132a2d;
-    --surface-2:#0d2224;
-    --line:#1e3c3f;
-    --line-soft:#16302f;
-    --text:#e7f3f1;
-    --text-muted:#7fa6a1;
-    --text-dim:#4d6f6b;
-    --teal:#2fd9c4;
-    --teal-dim:#1a4a44;
-    --amber:#f2b84b;
-    --amber-dim:#4a3a1a;
-    --danger:#e8735a;
-    --radius:10px;
-    --mono:'JetBrains Mono', monospace;
+    --ink:#1a1030;
+    --ink-2:#241541;
+    --ink-3:#2e1c52;
+    --gold:#e3b341;
+    --gold-soft:#f2d693;
+    --cream:#faf6ee;
+    --line:rgba(255,255,255,0.14);
+    --text-hi:#ffffff;
+    --text-mut:rgba(255,255,255,0.72);
+    --text-dim:rgba(255,255,255,0.46);
+    --app-teal:#1f9e8c;
+    --app-teal-bg:#e8f6f3;
+    --app-gold:#c8912e;
+    --app-gold-bg:#fbf1de;
+    --serif:'Fraunces', serif;
     --sans:'Inter', sans-serif;
-    --display:'Space Grotesk', sans-serif;
+    --mono:'JetBrains Mono', monospace;
   }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
   body{
-    background:
-      radial-gradient(1200px 600px at 85% -10%, rgba(47,217,196,0.07), transparent 60%),
-      var(--bg);
-    color:var(--text);
     font-family:var(--sans);
-    min-height:100vh;
-    line-height:1.5;
+    background:var(--cream);
+    color:var(--ink);
   }
-  ::selection{ background:var(--teal-dim); color:var(--teal); }
-  a{ color:var(--teal); }
+  a{ color:inherit; text-decoration:none; }
+  img{ max-width:100%; display:block; }
 
-  .wrap{ max-width:1180px; margin:0 auto; padding:28px 20px 64px; }
-
-  /* ---------- Header ---------- */
-  header.top{
-    display:flex; align-items:flex-end; justify-content:space-between;
-    gap:20px; flex-wrap:wrap;
-    padding-bottom:22px; margin-bottom:22px;
-    border-bottom:1px solid var(--line);
-  }
-  .brand{ display:flex; align-items:center; gap:12px; }
-  .brand .mark{
-    width:38px; height:38px; border-radius:9px;
-    background:linear-gradient(155deg, var(--teal), #157e70);
-    display:flex; align-items:center; justify-content:center;
-    font-family:var(--display); font-weight:700; color:#04201c; font-size:16px;
-    box-shadow:0 0 0 1px rgba(47,217,196,0.25), 0 8px 20px -8px rgba(47,217,196,0.5);
-  }
-  .brand h1{
-    font-family:var(--display); font-weight:600; font-size:21px; margin:0; letter-spacing:0.2px;
-  }
-  .brand p{ margin:2px 0 0; color:var(--text-muted); font-size:12.5px; font-family:var(--mono); }
-  .top-right{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-
-  button, select, input{
-    font-family:var(--sans); font-size:13px; color:var(--text);
-    background:var(--surface); border:1px solid var(--line);
-    border-radius:8px; padding:8px 12px;
-  }
-  select{ font-family:var(--mono); cursor:pointer; }
-  button{ cursor:pointer; transition:border-color .15s, color .15s, background .15s; }
-  button:hover{ border-color:var(--teal); color:var(--teal); }
-  button.primary{ background:var(--teal); color:#04201c; border-color:var(--teal); font-weight:600; }
-  button.primary:hover{ background:#3fe9d4; color:#04201c; }
-  input:focus, select:focus{ outline:none; border-color:var(--teal); }
-
-  /* ---------- Filter bar ---------- */
-  .filterbar{
-    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
-    background:var(--surface-2); border:1px solid var(--line);
-    border-radius:var(--radius); padding:12px 14px; margin-bottom:24px;
-  }
-  .filterbar label{ font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-dim); margin-right:6px; }
-  .filterbar .grp{ display:flex; align-items:center; }
-  .filterbar input[type=text]{ min-width:220px; }
-  .spacer{ flex:1; }
-
-  /* ---------- Data gap banner ---------- */
-  .gapbar{
-    display:none; align-items:flex-start; gap:10px;
-    background:var(--amber-dim); border:1px solid #6b5322;
-    color:#f6d99a; border-radius:var(--radius); padding:12px 14px; margin-bottom:22px;
-    font-size:13px;
-  }
-  .gapbar.show{ display:flex; }
-  .gapbar .ico{ font-family:var(--mono); font-weight:700; color:var(--amber); }
-  .gapbar ul{ margin:6px 0 0; padding-left:18px; }
-  .gapbar li{ margin:2px 0; font-family:var(--mono); font-size:12px; color:#e6c67e; }
-  .gapbar .ttl{ font-weight:600; color:var(--amber); }
-
-  /* ---------- Section headers ---------- */
-  .section{ margin-bottom:36px; }
-  .section-head{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:14px; }
-  .section-head h2{
-    font-family:var(--display); font-size:15px; font-weight:600; margin:0;
-    text-transform:uppercase; letter-spacing:0.09em; color:var(--text);
-    display:flex; align-items:center; gap:8px;
-  }
-  .section-head h2 .dot{ width:8px; height:8px; border-radius:50%; display:inline-block; }
-  .section-head .hint{ font-size:12px; color:var(--text-dim); font-family:var(--mono); }
-
-  /* ---------- The commit-graph timeline (signature element) ---------- */
-  .graph{
-    background:var(--surface-2); border:1px solid var(--line); border-radius:var(--radius);
-    padding:6px 18px 18px;
-    overflow-x:auto;
-  }
-  .graph-row{
-    display:grid;
-    grid-template-columns: 78px 1fr 46px 1fr;
-    align-items:stretch;
-    min-width:640px;
-  }
-  .graph-row .year-col{
-    display:flex; align-items:center; justify-content:flex-end;
-    font-family:var(--mono); color:var(--text-dim); font-size:12px; padding-right:10px;
-  }
-  .track{ position:relative; padding:14px 6px; }
-  .track::before{
-    content:''; position:absolute; left:16px; top:0; bottom:0; width:2px;
-    background:var(--line-soft);
-  }
-  .track.role::before{ background:linear-gradient(var(--teal-dim), var(--teal-dim)); }
-  .track.person::before{ background:linear-gradient(var(--amber-dim), var(--amber-dim)); }
-  .node{
-    position:relative; margin-left:34px; padding:9px 12px; border-radius:8px;
-    background:var(--surface); border:1px solid var(--line);
-    font-size:12.5px; cursor:pointer; transition:transform .12s, border-color .12s, background .12s;
-  }
-  .node:hover{ transform:translateX(2px); }
-  .node .dotmark{
-    position:absolute; left:-26px; top:14px; width:11px; height:11px; border-radius:50%;
-    border:2px solid var(--bg); box-shadow:0 0 0 1px var(--line-soft);
-  }
-  .track.role .dotmark{ background:var(--teal); }
-  .track.person .dotmark{ background:var(--amber); }
-  .node .ttl{ font-weight:600; color:var(--text); }
-  .node .meta{ color:var(--text-muted); font-family:var(--mono); font-size:11px; margin-top:3px; }
-  .node .evt{ color:var(--text-dim); font-size:11px; margin-top:2px; font-style:italic; }
-  .node.gap{ border-style:dashed; border-color:#5a4826; color:var(--amber); }
-  .node.gap .ttl{ color:var(--amber); }
-  .node.empty{ visibility:hidden; }
-  .node.selected{ border-color:var(--teal); box-shadow:0 0 0 1px var(--teal); }
-  .track.person .node.selected{ border-color:var(--amber); box-shadow:0 0 0 1px var(--amber); }
-
-  .linkcol{ position:relative; display:flex; align-items:center; justify-content:center; }
-  .linkcol .bridge{
-    width:100%; height:2px; background:repeating-linear-gradient(90deg, var(--text-dim) 0 5px, transparent 5px 9px);
+  /* ============ HERO ============ */
+  .hero{
     position:relative;
+    background:
+      radial-gradient(900px 500px at 18% -10%, rgba(227,179,65,0.16), transparent 60%),
+      linear-gradient(165deg, var(--ink) 0%, var(--ink-2) 55%, var(--ink-3) 100%);
+    padding:26px 0 0;
+    overflow:hidden;
   }
-  .linkcol .bridge::after{
-    content:'⇄'; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
-    color:var(--text-muted); font-size:11px; background:var(--surface-2); padding:0 3px;
+  .branch-art{
+    position:absolute; inset:0; z-index:0; opacity:0.5;
+    pointer-events:none;
   }
-  .linkcol.no-link .bridge{ opacity:0.15; }
-  .linkcol.no-link .bridge::after{ content:'·'; opacity:0.3; }
+  .hero-inner{ position:relative; z-index:1; }
 
-  .track-label{
-    font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:0.08em;
-    color:var(--text-dim); padding-left:34px; margin-bottom:2px;
+  .nav{
+    max-width:1180px; margin:0 auto; padding:14px 28px;
+    display:flex; align-items:center; justify-content:space-between; gap:18px;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand .mark{
+    width:30px; height:30px; border-radius:8px;
+    background:conic-gradient(from 200deg, var(--gold), var(--gold-soft), var(--gold));
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 0 1px rgba(255,255,255,0.15);
+  }
+  .brand .mark svg{ width:16px; height:16px; }
+  .brand span{ font-family:var(--serif); font-weight:600; font-size:19px; color:var(--text-hi); letter-spacing:0.2px; }
+
+  nav.links{ display:flex; align-items:center; gap:30px; }
+  nav.links a{ font-size:14px; color:var(--text-mut); display:flex; align-items:center; gap:4px; white-space:nowrap; }
+  nav.links a:hover{ color:var(--text-hi); }
+  nav.links .care{ font-size:10px; opacity:0.7; }
+
+  .nav-actions{ display:flex; align-items:center; gap:10px; }
+  .btn{
+    font-family:var(--sans); font-size:13.5px; font-weight:600; cursor:pointer;
+    padding:9px 18px; border-radius:8px; border:1px solid transparent;
+    transition:transform .12s, opacity .12s, background .12s;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .btn:hover{ transform:translateY(-1px); }
+  .btn-ghost{ color:var(--text-hi); border-color:var(--line); background:transparent; }
+  .btn-ghost:hover{ background:rgba(255,255,255,0.06); }
+  .btn-gold{ background:linear-gradient(180deg, var(--gold-soft), var(--gold)); color:#241102; }
+  .btn-outline-hero{ color:var(--text-hi); border-color:rgba(255,255,255,0.35); background:rgba(255,255,255,0.04); }
+
+  .hero-copy{
+    max-width:760px; margin:64px auto 0; padding:0 28px; text-align:center;
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11.5px;
+    letter-spacing:0.12em; text-transform:uppercase; color:var(--gold-soft);
+    border:1px solid rgba(227,179,65,0.35); background:rgba(227,179,65,0.08);
+    padding:6px 12px; border-radius:100px; margin-bottom:22px;
+  }
+  .eyebrow .dot{ width:6px; height:6px; border-radius:50%; background:var(--gold); }
+  .hero-copy h1{
+    font-family:var(--serif); font-weight:600; font-size:53px; line-height:1.08;
+    color:var(--text-hi); margin:0 0 20px; letter-spacing:-0.5px;
+  }
+  .hero-copy h1 em{ font-style:italic; color:var(--gold-soft); font-weight:500; }
+  .hero-copy p{
+    font-size:16.5px; line-height:1.65; color:var(--text-mut); margin:0 auto 32px; max-width:600px;
+  }
+  .hero-ctas{ display:flex; gap:14px; justify-content:center; margin-bottom:20px; flex-wrap:wrap; }
+  .hero-ctas .btn{ padding:12px 24px; font-size:14.5px; }
+  .hero-sub-note{ font-family:var(--mono); font-size:11.5px; color:var(--text-dim); margin-bottom:58px; }
+
+  /* ============ PRODUCT PREVIEW ============ */
+  .preview-wrap{
+    max-width:1040px; margin:0 auto; padding:0 24px;
+    position:relative; z-index:2;
+  }
+  .preview-frame{
+    background:var(--cream);
+    border-radius:16px 16px 0 0;
+    box-shadow:0 40px 90px -30px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.06);
+    overflow:hidden;
+    transform:translateY(2px);
+  }
+  .preview-chrome{
+    display:flex; align-items:center; gap:8px; padding:11px 16px;
+    background:#f1ece0; border-bottom:1px solid #e3dcc9;
+  }
+  .preview-chrome .dot{ width:9px; height:9px; border-radius:50%; }
+  .preview-chrome .dot:nth-child(1){ background:#e8735a; }
+  .preview-chrome .dot:nth-child(2){ background:var(--app-gold); }
+  .preview-chrome .dot:nth-child(3){ background:var(--app-teal); }
+  .preview-chrome .url{
+    margin-left:10px; font-family:var(--mono); font-size:11px; color:#8a8262;
+    background:#faf7ee; border:1px solid #e3dcc9; border-radius:6px; padding:4px 10px;
   }
 
-  /* ---------- Two panel detail view ---------- */
-  .panels{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
-  @media (max-width:820px){ .panels{ grid-template-columns:1fr; } }
-  .panel{
-    background:var(--surface-2); border:1px solid var(--line); border-radius:var(--radius);
-    padding:16px 18px;
+  .app{ display:grid; grid-template-columns:200px 1fr; min-height:460px; }
+  .app-side{ background:#fbf9f3; border-right:1px solid #ece5d2; padding:18px 14px; }
+  .app-side .brandmini{ display:flex; align-items:center; gap:8px; padding:0 6px 18px; }
+  .app-side .brandmini .m{ width:20px; height:20px; border-radius:5px; background:conic-gradient(from 200deg, var(--gold), var(--gold-soft)); }
+  .app-side .brandmini b{ font-family:var(--serif); font-size:14px; }
+  .app-side .brandmini small{ display:block; font-size:9.5px; color:#9a9376; font-family:var(--mono); }
+  .navitem{
+    display:flex; align-items:center; gap:9px; padding:8px 10px; border-radius:7px;
+    font-size:12.5px; color:#5c5642; margin-bottom:2px;
   }
-  .panel h3{
-    font-family:var(--display); font-size:14px; margin:0 0 12px; color:var(--text);
-    display:flex; align-items:center; gap:8px;
-  }
-  .panel h3 .dot{ width:8px; height:8px; border-radius:50%; }
-  .role-dot{ background:var(--teal); }
-  .person-dot{ background:var(--amber); }
-  .timeline-list{ list-style:none; margin:0; padding:0; position:relative; }
-  .timeline-list li{
-    padding:9px 0 9px 20px; border-left:2px solid var(--line-soft); position:relative; margin-left:4px;
-  }
-  .timeline-list li::before{
-    content:''; position:absolute; left:-7px; top:14px; width:11px; height:11px; border-radius:50%;
-    background:var(--surface-2); border:2px solid var(--teal);
-  }
-  .panel.person .timeline-list li::before{ border-color:var(--amber); }
-  .timeline-list li:last-child{ border-left-color:transparent; }
-  .yr{ font-family:var(--mono); color:var(--text-muted); font-size:11.5px; }
-  .ti{ font-weight:600; font-size:13.5px; margin:2px 0; }
-  .sub{ font-size:12px; color:var(--text-muted); }
-  .ev{ font-size:11.5px; color:var(--text-dim); font-style:italic; margin-top:2px; }
-  .missing{ color:var(--amber); }
+  .navitem.active{ background:var(--app-teal-bg); color:var(--app-teal); font-weight:600; }
+  .navitem .ic{ width:14px; height:14px; border-radius:3px; background:#d8d2bd; flex-shrink:0; }
+  .navitem.active .ic{ background:var(--app-teal); }
 
-  /* ---------- Query box ---------- */
-  .query{
-    background:var(--surface-2); border:1px solid var(--line); border-radius:var(--radius);
-    padding:16px 18px; margin-bottom:36px;
-  }
-  .query h3{ font-family:var(--display); font-size:14px; margin:0 0 10px; }
-  .query-row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-  .query-answer{
-    margin-top:12px; padding:12px 14px; border-radius:8px; background:var(--surface);
-    border:1px solid var(--line); font-size:13px; min-height:20px;
-  }
-  .query-answer b{ color:var(--teal); }
-  .query-answer .warn{ color:var(--amber); }
+  .app-main{ padding:22px 26px; }
+  .app-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+  .app-head h2{ font-family:var(--serif); font-size:19px; margin:0; }
+  .app-head .who{ display:flex; align-items:center; gap:8px; font-size:12px; color:#7a7458; }
+  .app-head .avatar{ width:24px; height:24px; border-radius:50%; background:linear-gradient(160deg,var(--app-teal),#0d5c50); }
 
-  /* ---------- Import panel ---------- */
-  details.import{
-    background:var(--surface-2); border:1px solid var(--line); border-radius:var(--radius);
-    padding:2px 18px; margin-bottom:30px;
+  .stat-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px; }
+  .stat-card{
+    background:#fff; border:1px solid #ece5d2; border-radius:10px; padding:13px 14px;
   }
-  details.import summary{
-    cursor:pointer; padding:14px 0; font-family:var(--display); font-size:14px;
-    list-style:none; display:flex; align-items:center; justify-content:space-between;
-  }
-  details.import summary::-webkit-details-marker{ display:none; }
-  details.import summary .chev{ color:var(--text-dim); transition:transform .15s; font-family:var(--mono); }
-  details.import[open] summary .chev{ transform:rotate(90deg); }
-  .import-body{ padding:0 0 18px; }
-  .import-tabs{ display:flex; gap:6px; margin-bottom:10px; }
-  .import-tabs button{ padding:6px 12px; font-size:12px; }
-  .import-tabs button.active{ border-color:var(--teal); color:var(--teal); }
-  textarea{
-    width:100%; min-height:130px; background:var(--surface); border:1px solid var(--line);
-    border-radius:8px; color:var(--text); font-family:var(--mono); font-size:12px; padding:10px 12px;
-    resize:vertical;
-  }
-  .import-actions{ display:flex; gap:10px; margin-top:10px; align-items:center; flex-wrap:wrap;}
-  .import-note{ font-size:11.5px; color:var(--text-dim); margin-top:8px; }
-  .import-hidden{ display:none; }
-  .fileinput{ font-size:12px; }
+  .stat-card .lbl{ display:flex; align-items:center; gap:6px; font-size:11px; color:#8a8262; margin-bottom:8px; }
+  .stat-card .lbl .sw{ width:16px; height:16px; border-radius:5px; }
+  .stat-card:nth-child(1) .sw{ background:var(--app-teal-bg); }
+  .stat-card:nth-child(2) .sw{ background:var(--app-gold-bg); }
+  .stat-card:nth-child(3) .sw{ background:var(--app-teal-bg); }
+  .stat-card:nth-child(4) .sw{ background:#fde8e3; }
+  .stat-card .val{ font-family:var(--serif); font-size:22px; font-weight:600; display:flex; align-items:baseline; gap:8px; }
+  .stat-card .val .chg{ font-family:var(--mono); font-size:10.5px; color:var(--app-teal); font-weight:500; }
 
-  footer.note{
-    text-align:center; color:var(--text-dim); font-size:11.5px; font-family:var(--mono);
-    margin-top:20px;
-  }
+  .panel-row{ display:grid; grid-template-columns:1.5fr 1fr; gap:14px; margin-bottom:16px; }
+  .card{ background:#fff; border:1px solid #ece5d2; border-radius:10px; padding:14px 16px; }
+  .card-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+  .card-head h3{ font-size:12.5px; margin:0; font-weight:600; color:#3a3626; }
+  .card-head .tag{ font-family:var(--mono); font-size:10px; color:#9a9376; background:#f6f3e9; padding:3px 8px; border-radius:100px; }
 
-  @media (prefers-reduced-motion: reduce){
-    *{ transition:none !important; }
+  .bars{ display:flex; align-items:flex-end; gap:8px; height:110px; }
+  .bar{ flex:1; border-radius:4px 4px 2px 2px; background:linear-gradient(180deg, var(--app-teal), #12564b); position:relative; }
+  .bar span{ position:absolute; bottom:-16px; left:50%; transform:translateX(-50%); font-family:var(--mono); font-size:8.5px; color:#a39c7d; }
+
+  .mini-line{ height:100px; position:relative; }
+  .mini-line svg{ width:100%; height:100%; }
+
+  .activity{ list-style:none; margin:0; padding:0; }
+  .activity li{ display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #f1ece0; font-size:12px; }
+  .activity li:last-child{ border-bottom:none; }
+  .activity .ic{ width:26px; height:26px; border-radius:7px; background:var(--app-teal-bg); color:var(--app-teal); display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:11px; font-weight:700; flex-shrink:0; }
+  .activity .body b{ display:block; font-size:12.5px; }
+  .activity .body small{ color:#9a9376; font-size:10.5px; }
+  .activity .when{ margin-left:auto; font-family:var(--mono); font-size:10px; color:#b3ac8c; white-space:nowrap; }
+
+  /* ============ TRUST STRIP ============ */
+  .trust{ background:var(--cream); padding:60px 24px 10px; text-align:center; }
+  .trust p{ font-family:var(--mono); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#a39c7d; margin:0 0 26px; }
+  .trust-row{ display:flex; justify-content:center; gap:52px; flex-wrap:wrap; opacity:0.55; filter:grayscale(1); }
+  .trust-row .word{ font-family:var(--serif); font-weight:600; font-size:19px; color:#3a3626; }
+
+  /* ============ FEATURES ============ */
+  .features{ max-width:1080px; margin:0 auto; padding:88px 28px 40px; }
+  .features-head{ text-align:center; max-width:600px; margin:0 auto 52px; }
+  .features-head .eyebrow-dark{
+    font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase;
+    color:var(--app-gold); margin-bottom:14px; display:inline-block;
+  }
+  .features-head h2{ font-family:var(--serif); font-size:34px; margin:0 0 14px; line-height:1.2; }
+  .features-head p{ color:#6b6550; font-size:15px; line-height:1.6; }
+
+  .feat-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  @media (max-width:860px){ .feat-grid{ grid-template-columns:1fr; } .panel-row{ grid-template-columns:1fr; } .stat-row{ grid-template-columns:1fr 1fr; } }
+  .feat-card{
+    background:#fff; border:1px solid #ece5d2; border-radius:14px; padding:26px 24px;
+    transition:transform .15s, box-shadow .15s;
+  }
+  .feat-card:hover{ transform:translateY(-3px); box-shadow:0 20px 40px -24px rgba(26,16,48,0.25); }
+  .feat-card .num{ font-family:var(--mono); font-size:11px; color:#b3ac8c; margin-bottom:14px; }
+  .feat-card h3{ font-family:var(--serif); font-size:19px; margin:0 0 8px; }
+  .feat-card p{ font-size:13.5px; color:#6b6550; line-height:1.6; margin:0; }
+  .feat-card .icon{
+    width:38px; height:38px; border-radius:10px; margin-bottom:16px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--app-teal-bg); color:var(--app-teal); font-family:var(--serif); font-weight:700;
+  }
+  .feat-card:nth-child(2) .icon{ background:var(--app-gold-bg); color:var(--app-gold); }
+  .feat-card:nth-child(3) .icon{ background:#fde8e3; color:#c65a44; }
+
+  /* ============ CTA BAND ============ */
+  .ctaband{
+    max-width:1080px; margin:70px auto; padding:56px 48px;
+    background:linear-gradient(155deg, var(--ink), var(--ink-3));
+    border-radius:20px; text-align:center; position:relative; overflow:hidden;
+  }
+  .ctaband::before{
+    content:''; position:absolute; inset:0;
+    background:radial-gradient(600px 300px at 80% 0%, rgba(227,179,65,0.18), transparent 60%);
+  }
+  .ctaband h2{ font-family:var(--serif); color:var(--text-hi); font-size:30px; margin:0 0 12px; position:relative; }
+  .ctaband p{ color:var(--text-mut); font-size:14.5px; margin:0 0 26px; position:relative; }
+  .ctaband .hero-ctas{ position:relative; }
+
+  footer{ padding:36px 28px 46px; text-align:center; }
+  footer p{ font-family:var(--mono); font-size:11px; color:#a39c7d; margin:0; }
+
+  @media (max-width:760px){
+    nav.links{ display:none; }
+    .hero-copy h1{ font-size:36px; }
+    .app{ grid-template-columns:1fr; }
+    .app-side{ display:none; }
   }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <header class="top">
-    <div class="brand">
-      <div class="mark">S</div>
-      <div>
-        <h1>Setel OrgHistory</h1>
-        <p>role &amp; people history — Lab 2 prototype</p>
+<section class="hero">
+  <svg class="branch-art" viewBox="0 0 1200 780" preserveAspectRatio="none">
+    <g stroke="rgba(255,255,255,0.5)" stroke-width="1" fill="none">
+      <path d="M600 40 L600 140"/>
+      <path d="M600 140 L420 220"/>
+      <path d="M600 140 L780 220"/>
+      <path d="M420 220 L340 320"/>
+      <path d="M420 220 L470 330"/>
+      <path d="M780 220 L730 330"/>
+      <path d="M780 220 L860 320"/>
+      <path d="M340 320 L300 420"/>
+      <path d="M340 320 L380 430"/>
+      <path d="M860 320 L900 420"/>
+      <path d="M860 320 L820 430"/>
+    </g>
+    <g fill="rgba(227,179,65,0.55)">
+      <circle cx="600" cy="40" r="3"/>
+      <circle cx="600" cy="140" r="3"/>
+      <circle cx="420" cy="220" r="3"/>
+      <circle cx="780" cy="220" r="3"/>
+      <circle cx="340" cy="320" r="3"/>
+      <circle cx="470" cy="330" r="3"/>
+      <circle cx="730" cy="330" r="3"/>
+      <circle cx="860" cy="320" r="3"/>
+      <circle cx="300" cy="420" r="3"/>
+      <circle cx="380" cy="430" r="3"/>
+      <circle cx="900" cy="420" r="3"/>
+      <circle cx="820" cy="430" r="3"/>
+    </g>
+  </svg>
+
+  <div class="hero-inner">
+    <div class="nav">
+      <div class="brand">
+        <div class="mark">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 2 L12 22 M12 2 L6 8 M12 2 L18 8 M12 22 L7 16 M12 22 L17 16" stroke="#241102" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <span>Lineage</span>
+      </div>
+      <nav class="links">
+        <a href="#">Why Lineage</a>
+        <a href="#">Product <span class="care">▾</span></a>
+        <a href="#">Solutions <span class="care">▾</span></a>
+        <a href="#">Resources <span class="care">▾</span></a>
+        <a href="#">Pricing <span class="care">▾</span></a>
+      </nav>
+      <div class="nav-actions">
+        <a class="btn btn-ghost">Sign in</a>
+        <a class="btn btn-gold">Get started</a>
       </div>
     </div>
-    <div class="top-right">
-      <span id="recordCount" style="font-family:var(--mono); font-size:12px; color:var(--text-muted);"></span>
-    </div>
-  </header>
 
-  <details class="import">
-    <summary>Import organisation data <span class="chev">›</span></summary>
-    <div class="import-body">
-      <div class="import-tabs">
-        <button class="active" data-tab="json" onclick="switchImportTab('json')">JSON</button>
-        <button data-tab="csv" onclick="switchImportTab('csv')">CSV</button>
-        <button data-tab="freeform" onclick="switchImportTab('freeform')">Freeform text</button>
+    <div class="hero-copy">
+      <span class="eyebrow"><span class="dot"></span> Built for people-centric orgs</span>
+      <h1>Every role has a story.<br><em>Lineage</em> keeps it straight.</h1>
+      <p>Track how positions change — titles, reporting lines, headcount — right alongside how people move through them. One connected history, not two disconnected spreadsheets.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-gold">See how it works</a>
+        <a class="btn btn-outline-hero">Try it free</a>
       </div>
+      <div class="hero-sub-note">No credit card · imports messy HR data as-is</div>
+    </div>
 
-      <div id="tab-json">
-        <textarea id="jsonInput" placeholder='{"roles":[...],"employees":[...]}  — paste structured JSON matching the schema'></textarea>
-        <div class="import-note">Expects <code>{ roles:[...], employees:[...] }</code>. Missing fields (manager, headcount, title, occupant) are kept and flagged as data gaps rather than rejected.</div>
+    <div class="preview-wrap">
+      <div class="preview-frame">
+        <div class="preview-chrome">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="url">app.lineage.hr/dashboard</span>
+        </div>
+        <div class="app">
+          <div class="app-side">
+            <div class="brandmini">
+              <div class="m"></div>
+              <div><b>Lineage</b><small>ORG HISTORY</small></div>
+            </div>
+            <div class="navitem active"><span class="ic"></span> Overview</div>
+            <div class="navitem"><span class="ic"></span> Roles</div>
+            <div class="navitem"><span class="ic"></span> People</div>
+            <div class="navitem"><span class="ic"></span> Connections</div>
+            <div class="navitem"><span class="ic"></span> Timeline</div>
+            <div class="navitem"><span class="ic"></span> Data gaps</div>
+            <div class="navitem"><span class="ic"></span> Imports</div>
+            <div class="navitem"><span class="ic"></span> Settings</div>
+          </div>
+          <div class="app-main">
+            <div class="app-head">
+              <h2>Overview</h2>
+              <div class="who"><div class="avatar"></div> Amir · Admin</div>
+            </div>
+
+            <div class="stat-row">
+              <div class="stat-card">
+                <div class="lbl"><span class="sw"></span> Total roles</div>
+                <div class="val">128 <span class="chg">▲ 6%</span></div>
+              </div>
+              <div class="stat-card">
+                <div class="lbl"><span class="sw"></span> Total people</div>
+                <div class="val">344 <span class="chg">▲ 3%</span></div>
+              </div>
+              <div class="stat-card">
+                <div class="lbl"><span class="sw"></span> Connections traced</div>
+                <div class="val">1,208 <span class="chg">▲ 11%</span></div>
+              </div>
+              <div class="stat-card">
+                <div class="lbl"><span class="sw"></span> Gaps flagged</div>
+                <div class="val">17 <span class="chg" style="color:#c65a44;">▼ 4%</span></div>
+              </div>
+            </div>
+
+            <div class="panel-row">
+              <div class="card">
+                <div class="card-head"><h3>Role changes by year</h3><span class="tag">2020–2025</span></div>
+                <div class="bars">
+                  <div class="bar" style="height:38%"><span>2020</span></div>
+                  <div class="bar" style="height:52%"><span>2021</span></div>
+                  <div class="bar" style="height:46%"><span>2022</span></div>
+                  <div class="bar" style="height:70%"><span>2023</span></div>
+                  <div class="bar" style="height:64%"><span>2024</span></div>
+                  <div class="bar" style="height:88%"><span>2025</span></div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-head"><h3>Data completeness</h3><span class="tag">30d</span></div>
+                <div class="mini-line">
+                  <svg viewBox="0 0 220 100" preserveAspectRatio="none">
+                    <polyline points="0,70 30,60 60,66 90,40 120,48 150,26 180,34 220,18" fill="none" stroke="#1f9e8c" stroke-width="2.5"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head"><h3>Recent connections traced</h3><span class="tag">View all</span></div>
+              <ul class="activity">
+                <li><div class="ic">SE</div><div class="body"><b>Software Engineer → Amir</b><small>Redesignated, reporting line moved</small></div><div class="when">2024</div></li>
+                <li><div class="ic">PM</div><div class="body"><b>Product Manager → Ain</b><small>Promoted to Senior, new manager</small></div><div class="when">2025</div></li>
+                <li><div class="ic">DA</div><div class="body"><b>Data Analyst → vacant</b><small>No occupant on file this year</small></div><div class="when">2024</div></li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
-
-      <div id="tab-csv" class="import-hidden">
-        <textarea id="csvInput" placeholder="type,id,year,title,department,manager_or_reportingTo,headcount,occupant_or_name,event&#10;role,ENG-SE,2024,Software Engineer,Technology,Farid,5,amir,Redesignated"></textarea>
-        <div class="import-note">One row per year-record. First column must be <code>role</code> or <code>employee</code>. Malformed rows are skipped and listed under Data Gaps — they never crash the import.</div>
-      </div>
-
-      <div id="tab-freeform" class="import-hidden">
-        <textarea id="freeformInput" placeholder="Amir - Software Engineer - Technology - 2024 - reports to Farid&#10;Nadia, Engineering Manager, Engineering, 2023, no manager listed"></textarea>
-        <div class="import-note">Unstructured lines are parsed heuristically (year, name, department keywords, "reports to X"). Anything that can't be confidently parsed is logged as a data gap and skipped, not thrown away silently.</div>
-      </div>
-
-      <div class="import-actions">
-        <button class="primary" onclick="runImport()">Parse &amp; load</button>
-        <button onclick="loadMockData()">Reset to sample data</button>
-        <input class="fileinput" type="file" id="fileUpload" accept=".json,.csv,.txt" onchange="handleFileUpload(event)">
-      </div>
-    </div>
-  </details>
-
-  <div class="filterbar">
-    <div class="grp"><label>Department</label>
-      <select id="deptFilter" onchange="renderAll()"></select>
-    </div>
-    <div class="grp"><label>Year</label>
-      <select id="yearFilter" onchange="renderAll()"></select>
-    </div>
-    <div class="grp"><label>Search</label>
-      <input type="text" id="searchBox" placeholder="role or person name…" oninput="renderAll()">
-    </div>
-    <div class="spacer"></div>
-    <span id="filterHint" style="font-family:var(--mono); font-size:11.5px; color:var(--text-dim);"></span>
-  </div>
-
-  <div class="gapbar" id="gapBanner">
-    <span class="ico">⚠</span>
-    <div>
-      <span class="ttl">Data gaps detected</span> — the records below are incomplete or malformed. They're shown, not hidden, so history stays visible even when the source data isn't clean.
-      <ul id="gapList"></ul>
     </div>
   </div>
+</section>
 
-  <div class="section">
-    <div class="section-head">
-      <h2><span class="dot" style="background:var(--teal)"></span> Role ↔ Person timeline</h2>
-      <span class="hint">connector column shows who held the role that year</span>
-    </div>
-    <div class="graph" id="graphContainer"></div>
+<div class="trust">
+  <p>Trusted by people teams tracking org change at</p>
+  <div class="trust-row">
+    <span class="word">Setel</span>
+    <span class="word">Northwind</span>
+    <span class="word">Kelapa Group</span>
+    <span class="word">Anggun Retail</span>
+    <span class="word">Bina Corp</span>
   </div>
-
-  <div class="query">
-    <h3>Ask the connection</h3>
-    <div class="query-row">
-      <label style="font-size:12px;color:var(--text-dim)">Who held</label>
-      <select id="qRole"></select>
-      <label style="font-size:12px;color:var(--text-dim)">in</label>
-      <select id="qYear"></select>
-      <button class="primary" onclick="answerQuery()">Show</button>
-    </div>
-    <div class="query-answer" id="queryAnswer">Pick a role and a year to trace the person behind it.</div>
-  </div>
-
-  <div class="section">
-    <div class="section-head">
-      <h2><span class="dot" style="background:var(--teal)"></span> Role view</h2>
-      <span class="hint">title, redesignation, reporting line, headcount</span>
-    </div>
-  </div>
-  <div class="panels" style="margin-bottom:36px;">
-    <div class="panel role">
-      <h3><span class="dot role-dot"></span> <span id="roleTitleHead">—</span></h3>
-      <ul class="timeline-list" id="roleTimeline"></ul>
-    </div>
-    <div class="panel person">
-      <h3><span class="dot person-dot"></span> <span id="personTitleHead">—</span></h3>
-      <ul class="timeline-list" id="personTimeline"></ul>
-    </div>
-  </div>
-
-  <footer class="note">Setel OrgHistory · Lab 2 — People-Centric Tech &amp; Collaboration · mock data, client-side only</footer>
 </div>
 
-<script>
-/* ============================= DATA MODEL =============================
-  roles:      [{ id, title(base), department, history:[{year, title, reportingTo, headcount, occupant, event}] }]
-  employees:  [{ id, name, department, history:[{year, title, department, manager, event}] }]
-  A role-history entry's `occupant` is an employee id — that's the literal
-  connection the lab asks for. Any field can be null/undefined: the renderer
-  treats that as a data gap, flags it, and keeps going.
-======================================================================== */
+<section class="features">
+  <div class="features-head">
+    <span class="eyebrow-dark">Why Lineage</span>
+    <h2>Two histories, finally in one place</h2>
+    <p>Most HR tools track people, or they track roles. Lineage is built around the connection between the two — because that's the question people actually ask.</p>
+  </div>
+  <div class="feat-grid">
+    <div class="feat-card">
+      <div class="icon">R</div>
+      <div class="num">01</div>
+      <h3>Role history</h3>
+      <p>Every title change, redesignation, reporting-line move, and headcount shift — logged year by year, not buried in a spreadsheet tab.</p>
+    </div>
+    <div class="feat-card">
+      <div class="icon">P</div>
+      <div class="num">02</div>
+      <h3>People journeys</h3>
+      <p>Follow a promotion, a transfer, a department change, or a new manager — from the person's side, in the order it actually happened.</p>
+    </div>
+    <div class="feat-card">
+      <div class="icon">⇄</div>
+      <div class="num">03</div>
+      <h3>The connection</h3>
+      <p>Ask "who held this role in 2024" and get a straight answer — plus what happened to them next. Messy or incomplete records are flagged, never dropped.</p>
+    </div>
+  </div>
+</section>
 
-let roles = [];
-let employees = [];
-let dataGaps = [];   // strings describing detected gaps
-let selected = { roleId:null, employeeId:null };
+<div class="ctaband">
+  <h2>Bring your org's history into one line.</h2>
+  <p>Import what you already have — spreadsheets, exports, even rough notes. Lineage sorts out the rest.</p>
+  <div class="hero-ctas">
+    <a class="btn btn-gold">Get started free</a>
+    <a class="btn btn-outline-hero">Talk to us</a>
+  </div>
+</div>
 
-function loadMockData(){
-  roles = [
-    { id:'role-se', title:'Software Engineer', department:'Technology', history:[
-      { year:2022, title:'Junior Software Engineer', reportingTo:'Nadia Rahman (Eng. Manager)', headcount:3, occupant:'amir', event:'Role created' },
-      { year:2023, title:'Junior Software Engineer', reportingTo:'Nadia Rahman (Eng. Manager)', headcount:4, occupant:'amir', event:'Headcount increased' },
-      { year:2024, title:'Software Engineer', reportingTo:'Farid Iskandar (Tech Lead)', headcount:5, occupant:'amir', event:'Redesignated; reporting line moved to Tech Lead' },
-      { year:2025, title:'Senior Software Engineer', reportingTo:'Farid Iskandar (Tech Lead)', headcount:null, occupant:'amir', event:'Title promoted — headcount not yet reported' },
-    ]},
-    { id:'role-pm', title:'Product Manager', department:'Product', history:[
-      { year:2022, title:'Associate Product Manager', reportingTo:'Suresh Kumar (Head of Product)', headcount:2, occupant:'ain', event:'Role created' },
-      { year:2023, title:'Product Manager', reportingTo:'Suresh Kumar (Head of Product)', headcount:2, occupant:'ain', event:'Promotion' },
-      { year:2024, title:'Product Manager', reportingTo: null, headcount:3, occupant:'ain', event:'Reporting line vacant — Head of Product role open' },
-      { year:2025, title:'Senior Product Manager', reportingTo:'Wei Ling (VP Product)', headcount:3, occupant:'wei_ling_pm_2025_unmapped', event:'Occupant record refers to an unknown employee id' },
-    ]},
-    { id:'role-ds', title:'Data Analyst', department:'Technology', history:[
-      { year:2023, title:'Data Analyst', reportingTo:'Farid Iskandar (Tech Lead)', headcount:2, occupant:'haziq', event:'Role created' },
-      { year:2024, title:'Data Analyst', reportingTo:'Farid Iskandar (Tech Lead)', headcount:2, occupant:null, event:'No occupant on file for this year' },
-      { year:2025, title:'Senior Data Analyst', reportingTo:'Farid Iskandar (Tech Lead)', headcount:2, occupant:'haziq', event:'Promotion; role re-filled' },
-    ]},
-  ];
+<footer>
+  <p>Lineage — an org history tool · mock marketing page</p>
+</footer>
 
-  employees = [
-    { id:'amir', name:'Amir', department:'Technology', history:[
-      { year:2022, title:'Junior Software Engineer', department:'Engineering', manager:'Nadia Rahman', event:'Joined as Junior Software Engineer' },
-      { year:2023, title:'Junior Software Engineer', department:'Engineering', manager:'Nadia Rahman', event:'Confirmed after probation' },
-      { year:2024, title:'Software Engineer', department:'Technology', manager:'Farid Iskandar', event:'Transferred from Engineering to Technology + promoted' },
-      { year:2025, title:'Senior Software Engineer', department:'Technology', manager:null, event:'Promoted to Senior — manager record missing for 2025' },
-    ]},
-    { id:'ain', name:'Ain', department:'Product', history:[
-      { year:2022, title:'Associate Product Manager', department:'Product', manager:'Suresh Kumar', event:'Joined as Associate PM' },
-      { year:2023, title:'Product Manager', department:'Product', manager:'Suresh Kumar', event:'Promoted to Product Manager' },
-      { year:2024, title:'Product Manager', department:'Product', manager:null, event:'Manager departed; backfill pending' },
-      { year:2025, title:'Senior Product Manager', department:'Product', manager:'Wei Ling', event:'Promoted; now reports to VP Product' },
-    ]},
-    { id:'haziq', name:'Haziq', department:'Technology', history:[
-      { year:2023, title:'Data Analyst', department:'Technology', manager:'Farid Iskandar', event:'Joined as Data Analyst' },
-      { year:2025, title:'Senior Data Analyst', department:'Technology', manager:'Farid Iskandar', event:'Promoted to Senior — 2024 record missing entirely' },
-    ]},
-  ];
-
-  dataGaps = [];
-  detectGaps();
-  populateFilters();
-  renderAll();
-}
-
-/* ============================= GAP DETECTION ============================= */
-function detectGaps(){
-  dataGaps = [];
-  const empIds = new Set(employees.map(e=>e.id));
-
-  roles.forEach(r=>{
-    r.history.forEach(h=>{
-      if(!h.title) dataGaps.push(`Role "${r.title}" (${h.year}): title missing`);
-      if(!h.reportingTo) dataGaps.push(`Role "${r.title}" (${h.year}): reporting line not recorded`);
-      if(h.headcount===null || h.headcount===undefined) dataGaps.push(`Role "${r.title}" (${h.year}): headcount not reported`);
-      if(!h.occupant) dataGaps.push(`Role "${r.title}" (${h.year}): no occupant on file`);
-      else if(!empIds.has(h.occupant)) dataGaps.push(`Role "${r.title}" (${h.year}): occupant id "${h.occupant}" does not match any known employee`);
-    });
-  });
-
-  employees.forEach(e=>{
-    const years = e.history.map(h=>h.year);
-    const span = years.length? (Math.max(...years)-Math.min(...years)) : 0;
-    if(span+1 > years.length){
-      dataGaps.push(`Employee "${e.name}": history has a year gap between ${Math.min(...years)}–${Math.max(...years)}`);
-    }
-    e.history.forEach(h=>{
-      if(!h.manager) dataGaps.push(`Employee "${e.name}" (${h.year}): manager not recorded`);
-    });
-  });
-
-  renderGapBanner();
-}
-
-function renderGapBanner(){
-  const banner = document.getElementById('gapBanner');
-  const list = document.getElementById('gapList');
-  list.innerHTML = '';
-  if(dataGaps.length===0){ banner.classList.remove('show'); return; }
-  banner.classList.add('show');
-  dataGaps.slice(0,12).forEach(g=>{
-    const li = document.createElement('li'); li.textContent = g; list.appendChild(li);
-  });
-  if(dataGaps.length>12){
-    const li = document.createElement('li'); li.textContent = `…and ${dataGaps.length-12} more`; list.appendChild(li);
-  }
-}
-
-/* ============================= FILTERS ============================= */
-function departmentsList(){
-  const s = new Set(['All']);
-  roles.forEach(r=>s.add(r.department||'Unspecified'));
-  employees.forEach(e=>s.add(e.department||'Unspecified'));
-  return [...s];
-}
-function yearsList(){
-  const s = new Set();
-  roles.forEach(r=>r.history.forEach(h=>s.add(h.year)));
-  employees.forEach(e=>e.history.forEach(h=>s.add(h.year)));
-  return [...s].sort((a,b)=>a-b);
-}
-function populateFilters(){
-  const dept = document.getElementById('deptFilter');
-  const yr = document.getElementById('yearFilter');
-  dept.innerHTML=''; departmentsList().forEach(d=>{
-    const o=document.createElement('option'); o.value=d; o.textContent=d; dept.appendChild(o);
-  });
-  const yrs = yearsList();
-  yr.innerHTML=''; const allOpt=document.createElement('option'); allOpt.value='All'; allOpt.textContent='All'; yr.appendChild(allOpt);
-  yrs.forEach(y=>{ const o=document.createElement('option'); o.value=y; o.textContent=y; yr.appendChild(o); });
-
-  const qRole = document.getElementById('qRole'); qRole.innerHTML='';
-  roles.forEach(r=>{ const o=document.createElement('option'); o.value=r.id; o.textContent=r.title; qRole.appendChild(o); });
-  const qYear = document.getElementById('qYear'); qYear.innerHTML='';
-  yrs.forEach(y=>{ const o=document.createElement('option'); o.value=y; o.textContent=y; qYear.appendChild(o); });
-}
-
-/* ============================= RENDER: GRAPH ============================= */
-function empName(id){
-  if(!id) return null;
-  const e = employees.find(x=>x.id===id);
-  return e ? e.name : `⚠ unresolved (${id})`;
-}
-
-function renderAll(){
-  const dept = document.getElementById('deptFilter').value || 'All';
-  const yearSel = document.getElementById('yearFilter').value || 'All';
-  const q = (document.getElementById('searchBox').value||'').toLowerCase().trim();
-
-  let visRoles = roles.filter(r => (dept==='All'||r.department===dept) && (!q || r.title.toLowerCase().includes(q)));
-  let visEmps = employees.filter(e => (dept==='All'||e.department===dept) && (!q || e.name.toLowerCase().includes(q)));
-
-  // pick a role+employee pair to headline: prefer search match, else first
-  const focusRole = visRoles[0] || roles[0];
-  const focusEmpFromSearch = visEmps.find(e=> focusRole && focusRole.history.some(h=>h.occupant===e.id));
-  const focusEmp = focusEmpFromSearch || (focusRole && employees.find(e=>focusRole.history.some(h=>h.occupant===e.id))) || employees[0];
-
-  selected.roleId = focusRole ? focusRole.id : null;
-  selected.employeeId = focusEmp ? focusEmp.id : null;
-
-  document.getElementById('recordCount').textContent = `${roles.length} roles · ${employees.length} people · ${dataGaps.length} gaps flagged`;
-  document.getElementById('filterHint').textContent = q ? `matching "${q}"` : '';
-
-  renderGraph(yearSel);
-  renderRolePanel();
-  renderPersonPanel();
-}
-
-function renderGraph(yearSel){
-  const container = document.getElementById('graphContainer');
-  container.innerHTML = '';
-
-  const role = roles.find(r=>r.id===selected.roleId);
-  const emp = employees.find(e=>e.id===selected.employeeId);
-
-  if(!role && !emp){
-    container.innerHTML = '<div style="padding:20px;color:var(--text-dim);font-family:var(--mono);font-size:12.5px;">No matching role or person for this filter.</div>';
-    return;
-  }
-
-  const label = document.createElement('div');
-  label.className = 'graph-row';
-  label.innerHTML = `<div></div><div class="track-label">Role · ${role? role.title : '—'}</div><div></div><div class="track-label">Person · ${emp? emp.name : '—'}</div>`;
-  container.appendChild(label);
-
-  let years = new Set();
-  (role? role.history: []).forEach(h=>years.add(h.year));
-  (emp? emp.history: []).forEach(h=>years.add(h.year));
-  years = [...years].sort((a,b)=>a-b);
-  if(yearSel!=='All') years = years.filter(y=>String(y)===String(yearSel));
-
-  if(years.length===0){
-    container.innerHTML += '<div style="padding:14px;color:var(--text-dim);font-family:var(--mono);font-size:12px;">No records for this year filter.</div>';
-    return;
-  }
-
-  years.forEach(y=>{
-    const rEntry = role ? role.history.find(h=>h.year===y) : null;
-    const eEntry = emp ? emp.history.find(h=>h.year===y) : null;
-    const linked = rEntry && eEntry && rEntry.occupant===emp.id;
-
-    const row = document.createElement('div');
-    row.className = 'graph-row';
-
-    const yearCol = document.createElement('div'); yearCol.className='year-col'; yearCol.textContent = y;
-
-    const roleTrack = document.createElement('div'); roleTrack.className='track role';
-    roleTrack.appendChild(makeNode(rEntry, 'role'));
-
-    const linkCol = document.createElement('div'); linkCol.className='linkcol'+(linked?'':' no-link');
-    linkCol.innerHTML = '<div class="bridge"></div>';
-
-    const personTrack = document.createElement('div'); personTrack.className='track person';
-    personTrack.appendChild(makeNode(eEntry, 'person'));
-
-    row.appendChild(yearCol); row.appendChild(roleTrack); row.appendChild(linkCol); row.appendChild(personTrack);
-    container.appendChild(row);
-  });
-}
-
-function makeNode(entry, kind){
-  const node = document.createElement('div');
-  if(!entry){ node.className='node empty'; node.innerHTML='&nbsp;'; return node; }
-
-  const gap = kind==='role'
-    ? (!entry.title || !entry.reportingTo || entry.headcount==null || !entry.occupant)
-    : (!entry.title || !entry.manager);
-  node.className = 'node' + (gap?' gap':'');
-  node.innerHTML = `<span class="dotmark"></span>`;
-
-  if(kind==='role'){
-    node.innerHTML += `
-      <div class="ttl">${entry.title || '⚠ title missing'}</div>
-      <div class="meta">${entry.reportingTo ? '→ '+entry.reportingTo : '⚠ no reporting line'} · hc ${entry.headcount ?? '⚠'} · ${empName(entry.occupant) ?? '⚠ vacant'}</div>
-      <div class="evt">${entry.event || ''}</div>`;
-  } else {
-    node.innerHTML += `
-      <div class="ttl">${entry.title || '⚠ title missing'}</div>
-      <div class="meta">${entry.department || '—'} · reports to ${entry.manager || '⚠ unknown'}</div>
-      <div class="evt">${entry.event || ''}</div>`;
-  }
-  return node;
-}
-
-/* ============================= RENDER: DETAIL PANELS ============================= */
-function renderRolePanel(){
-  const role = roles.find(r=>r.id===selected.roleId);
-  document.getElementById('roleTitleHead').textContent = role ? role.title : 'No role selected';
-  const ul = document.getElementById('roleTimeline'); ul.innerHTML='';
-  if(!role) return;
-  role.history.slice().sort((a,b)=>a.year-b.year).forEach(h=>{
-    const li = document.createElement('li');
-    li.innerHTML = `<div class="yr">${h.year}</div>
-      <div class="ti">${h.title || '<span class="missing">Title missing</span>'}</div>
-      <div class="sub">reports to ${h.reportingTo ? h.reportingTo : '<span class="missing">unrecorded</span>'} · headcount ${h.headcount!=null? h.headcount : '<span class="missing">n/a</span>'} · held by ${h.occupant? empName(h.occupant) : '<span class="missing">vacant</span>'}</div>
-      <div class="ev">${h.event||''}</div>`;
-    ul.appendChild(li);
-  });
-}
-
-function renderPersonPanel(){
-  const emp = employees.find(e=>e.id===selected.employeeId);
-  document.getElementById('personTitleHead').textContent = emp ? emp.name : 'No person selected';
-  const ul = document.getElementById('personTimeline'); ul.innerHTML='';
-  if(!emp) return;
-  emp.history.slice().sort((a,b)=>a.year-b.year).forEach(h=>{
-    const li = document.createElement('li');
-    li.innerHTML = `<div class="yr">${h.year}</div>
-      <div class="ti">${h.title || '<span class="missing">Title missing</span>'}</div>
-      <div class="sub">${h.department||'—'} · manager ${h.manager ? h.manager : '<span class="missing">unrecorded</span>'}</div>
-      <div class="ev">${h.event||''}</div>`;
-    ul.appendChild(li);
-  });
-}
-
-/* ============================= CONNECTION QUERY ============================= */
-function answerQuery(){
-  const roleId = document.getElementById('qRole').value;
-  const year = document.getElementById('qYear').value;
-  const role = roles.find(r=>r.id===roleId);
-  const box = document.getElementById('queryAnswer');
-  if(!role){ box.innerHTML = 'Pick a role to trace.'; return; }
-  const entry = role.history.find(h=>String(h.year)===String(year));
-  if(!entry){ box.innerHTML = `No record of <b>${role.title}</b> for ${year}.`; return; }
-  if(!entry.occupant){
-    box.innerHTML = `In <b>${year}</b>, <b>${role.title}</b> had <span class="warn">no occupant on file</span> — reporting line: ${entry.reportingTo||'<span class="warn">unrecorded</span>'}.`;
-    return;
-  }
-  const person = employees.find(e=>e.id===entry.occupant);
-  if(!person){
-    box.innerHTML = `In <b>${year}</b>, <b>${role.title}</b> was held by occupant id "<b>${entry.occupant}</b>" — <span class="warn">this id does not match any employee record</span>.`;
-    return;
-  }
-  // trace what happened to that person next
-  const laterYears = person.history.filter(h=>h.year>Number(year)).sort((a,b)=>a.year-b.year);
-  let after = '';
-  if(laterYears.length){
-    const next = laterYears[0];
-    after = ` Afterwards, in ${next.year} they moved to <b>${next.title}</b> (${next.department}) — ${next.event||'no notes'}.`;
-  } else {
-    after = ' No later record exists for this person yet.';
-  }
-  box.innerHTML = `In <b>${year}</b>, <b>${role.title}</b> was held by <b>${person.name}</b>.${after}`;
-  selected.roleId = role.id; selected.employeeId = person.id;
-  renderGraph(document.getElementById('yearFilter').value);
-  renderRolePanel(); renderPersonPanel();
-}
-
-/* ============================= IMPORT ============================= */
-function switchImportTab(name){
-  ['json','csv','freeform'].forEach(t=>{
-    document.getElementById('tab-'+t).classList.toggle('import-hidden', t!==name);
-  });
-  document.querySelectorAll('.import-tabs button').forEach(b=>{
-    b.classList.toggle('active', b.dataset.tab===name);
-  });
-}
-
-function handleFileUpload(evt){
-  const file = evt.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    const text = reader.result;
-    if(file.name.endsWith('.json')){ switchImportTab('json'); document.getElementById('jsonInput').value = text; }
-    else if(file.name.endsWith('.csv')){ switchImportTab('csv'); document.getElementById('csvInput').value = text; }
-    else { switchImportTab('freeform'); document.getElementById('freeformInput').value = text; }
-  };
-  reader.readAsText(file);
-}
-
-function runImport(){
-  const active = document.querySelector('.import-tabs button.active').dataset.tab;
-  try{
-    if(active==='json') importJSON(document.getElementById('jsonInput').value);
-    else if(active==='csv') importCSV(document.getElementById('csvInput').value);
-    else importFreeform(document.getElementById('freeformInput').value);
-  }catch(err){
-    dataGaps.push(`Import failed entirely, kept previous dataset: ${err.message}`);
-    renderGapBanner();
-  }
-}
-
-function importJSON(text){
-  if(!text || !text.trim()){ dataGaps.push('JSON import: empty input, nothing loaded'); renderGapBanner(); return; }
-  let parsed;
-  try{ parsed = JSON.parse(text); }
-  catch(e){ dataGaps.push(`JSON import: could not parse — ${e.message}. Previous data kept.`); renderGapBanner(); return; }
-
-  const newRoles = Array.isArray(parsed.roles) ? parsed.roles.filter(r=>{
-    if(!r || !r.id || !Array.isArray(r.history)){ dataGaps.push(`JSON import: skipped a role record missing id/history`); return false; }
-    return true;
-  }) : [];
-  const newEmps = Array.isArray(parsed.employees) ? parsed.employees.filter(e=>{
-    if(!e || !e.id || !Array.isArray(e.history)){ dataGaps.push(`JSON import: skipped an employee record missing id/history`); return false; }
-    return true;
-  }) : [];
-
-  if(newRoles.length===0 && newEmps.length===0){
-    dataGaps.push('JSON import: no valid roles or employees found — previous data kept.');
-    renderGapBanner();
-    return;
-  }
-  roles = newRoles.length? newRoles : roles;
-  employees = newEmps.length? newEmps : employees;
-  finishImport();
-}
-
-function importCSV(text){
-  if(!text || !text.trim()){ dataGaps.push('CSV import: empty input, nothing loaded'); renderGapBanner(); return; }
-  const lines = text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
-  const roleMap = {}; const empMap = {};
-  let skipped = 0;
-  lines.forEach((line, idx)=>{
-    const cols = line.split(',').map(c=>c.trim());
-    if(cols[0]==='type') return; // header row
-    if(cols.length < 4){ skipped++; return; }
-    const [type,id,year,title,dept,mgrOrReport,headcount,occOrName,event] = cols;
-    const y = parseInt(year,10);
-    if(!id || isNaN(y)){ skipped++; return; }
-    if(type==='role'){
-      if(!roleMap[id]) roleMap[id] = { id, title: title||'Unspecified role', department: dept||'Unspecified', history:[] };
-      roleMap[id].history.push({ year:y, title: title||null, reportingTo: mgrOrReport||null, headcount: headcount? parseInt(headcount,10): null, occupant: occOrName||null, event: event||'' });
-    } else if(type==='employee'){
-      if(!empMap[id]) empMap[id] = { id, name: occOrName||id, department: dept||'Unspecified', history:[] };
-      empMap[id].history.push({ year:y, title: title||null, department: dept||null, manager: mgrOrReport||null, event: event||'' });
-    } else { skipped++; }
-  });
-  if(skipped) dataGaps.push(`CSV import: skipped ${skipped} malformed row(s)`);
-  const newRoles = Object.values(roleMap), newEmps = Object.values(empMap);
-  if(newRoles.length===0 && newEmps.length===0){
-    dataGaps.push('CSV import: no usable rows found — previous data kept.');
-    renderGapBanner();
-    return;
-  }
-  roles = newRoles.length? newRoles : roles;
-  employees = newEmps.length? newEmps : employees;
-  finishImport();
-}
-
-function importFreeform(text){
-  if(!text || !text.trim()){ dataGaps.push('Freeform import: empty input, nothing loaded'); renderGapBanner(); return; }
-  const lines = text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
-  const empMap = {};
-  let unparsed = 0;
-  const deptKeywords = ['Technology','Engineering','Product','Finance','Operations','HR','Marketing','Retail'];
-
-  lines.forEach(line=>{
-    const yearMatch = line.match(/\b(19|20)\d{2}\b/);
-    const parts = line.split(/[-,|]/).map(p=>p.trim()).filter(Boolean);
-    if(!yearMatch || parts.length < 2){ unparsed++; return; }
-    const year = parseInt(yearMatch[0],10);
-    const name = parts[0];
-    const title = parts[1] || null;
-    let department = deptKeywords.find(k => line.toLowerCase().includes(k.toLowerCase())) || null;
-    const mgrMatch = line.match(/reports?\s*to\s*([A-Za-z ]+)/i);
-    const manager = mgrMatch ? mgrMatch[1].trim() : null;
-    const noMgr = /no manager/i.test(line);
-
-    if(!name){ unparsed++; return; }
-    const id = name.toLowerCase().replace(/\s+/g,'_');
-    if(!empMap[id]) empMap[id] = { id, name, department: department||'Unspecified', history:[] };
-    empMap[id].history.push({ year, title, department, manager: noMgr? null : manager, event:'Imported from freeform text' });
-  });
-
-  if(unparsed) dataGaps.push(`Freeform import: ${unparsed} line(s) could not be confidently parsed and were skipped`);
-  const newEmps = Object.values(empMap);
-  if(newEmps.length===0){
-    dataGaps.push('Freeform import: nothing usable found — previous data kept.');
-    renderGapBanner();
-    return;
-  }
-  employees = newEmps;
-  // freeform has no role source of truth — keep existing roles as-is
-  finishImport();
-}
-
-function finishImport(){
-  detectGaps();
-  populateFilters();
-  renderAll();
-}
-
-/* ============================= INIT ============================= */
-loadMockData();
-</script>
 </body>
 </html>
